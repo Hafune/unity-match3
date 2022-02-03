@@ -33,7 +33,23 @@ public class Match3 : MonoBehaviour
     {
         startGame();
     }
+    
+    void startGame()
+    {
+        board = new Node[width, height];
 
+        fills = new int[width];
+        random = new Random(getRandomSeed().GetHashCode());
+        update = new List<NodePiece>();
+        dead = new List<NodePiece>();
+        flipped = new List<FlippedPieces>();
+        killed = new List<KilledPiece>();
+
+        initializeBoard();
+        verifyBoard();
+        instantiateBoard();
+    }
+    
     void Update()
     {
         var finishedUpdating = update.Where(piece => !piece.updatePiece()).ToList();
@@ -146,23 +162,6 @@ public class Match3 : MonoBehaviour
     {
         return flipped.FirstOrDefault(t => t.getOtherPiece(p) != null);
     }
-
-    void startGame()
-    {
-        board = new Node[width, height];
-
-        fills = new int[width];
-        random = new Random(getRandomSeed().GetHashCode());
-        update = new List<NodePiece>();
-        dead = new List<NodePiece>();
-        flipped = new List<FlippedPieces>();
-        killed = new List<KilledPiece>();
-
-        initializeBoard();
-        verifyBoard();
-        instantiateBoard();
-    }
-
     void instantiateBoard()
     {
         for (var x = 0; x < width; x++)

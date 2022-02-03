@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.leopotam.ecs": "https://github.com/Leopotam/ecs.git",
     "com.unity.2d.animation": "5.0.10",
     "com.unity.2d.pixel-perfect": "4.0.1",
     "com.unity.2d.psdimporter": "4.1.3",
@@ -14,6 +15,7 @@
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.4.8",
     "com.unity.ugui": "1.0.0",
+    "com.voody.unileo": "https://github.com/voody2506/UniLeo.git",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
