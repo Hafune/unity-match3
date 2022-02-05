@@ -88,8 +88,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3411546b9e9b422fadf679f43c318c8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 0}
   rect: {fileID: 0}
   img: {fileID: 0}
   drag: {x: 0, y: 0}
   isDragged: 0
-  renderer: {fileID: 5114957395452692392}
+  canvasRenderer: {fileID: 5114957395452692392}

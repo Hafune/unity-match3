@@ -9,29 +9,40 @@ public class Piece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     [HideInInspector] public Image img = null!;
 
     [HideInInspector] public Vector2 drag;
-    public bool isDragged;
-    public CanvasRenderer renderer = null!;
+    public CanvasRenderer canvasRenderer = null!;
 
-    public void Initialize()
+    public bool isDragged;
+    public bool justPointerUp;
+    public bool blocked;
+
+    private MyEngine ecs = null!;
+
+    public void Initialize(MyEngine myEngine)
     {
         img = GetComponent<Image>();
         rect = GetComponent<RectTransform>();
+
+        ecs = myEngine;
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        renderer.transform.SetAsLastSibling();
+        canvasRenderer.transform.SetAsLastSibling();
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        if (blocked) return;
+        
         isDragged = false;
-        renderer.transform.SetAsFirstSibling();
+        justPointerUp = true;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (blocked) return;
+        
         isDragged = true;
-        drag += eventData.delta / canvas.scaleFactor;
+        drag += eventData.delta / canvas.scaleFactor / ecs.pixelPerMeter;
     }
 }

@@ -1,12 +1,13 @@
 using Leopotam.Ecs;
 using Source;
+using Source.Components;
 using Source.Systems;
 using UnityEngine;
 using Voody.UniLeo;
 
-public class EcsGameStartup : MonoBehaviour
+public class MyEngine : MonoBehaviour
 {
-    private EcsWorld world = null!;
+    public EcsWorld world { get; private set; } = null!;
     private EcsSystems systems = null!;
 
     public GameObject nodePiece = null!;
@@ -15,8 +16,13 @@ public class EcsGameStartup : MonoBehaviour
     public RectTransform gameBoard = null!;
     public BoardInitializer boardInitializer = null!;
 
+    public int?[,] valuesBoard = null!;
+
+    public float pixelPerMeter { get; private set; }
+
     private void Start()
     {
+        Screen.fullScreen = true;
         world = new EcsWorld();
         systems = new EcsSystems(world);
 
@@ -28,7 +34,7 @@ public class EcsGameStartup : MonoBehaviour
 
         systems.Init();
 
-        boardInitializer = new BoardInitializer(world, sprites, nodePiece, gameBoard);
+        boardInitializer = new BoardInitializer(this);
     }
 
     private void AddInjections()
@@ -37,16 +43,29 @@ public class EcsGameStartup : MonoBehaviour
 
     private void AddSystems()
     {
-        systems.Add(new MovementSystem(this));
+        systems.Add(new MatchSystem(this));
+        systems.Add(new DropPieceSystem());
+        systems.Add(new MovePieceSystem(this));
+        systems.Add(new RollbackSystem());
+        systems.Add(new FallSystem(this));
     }
 
     private void AddOneFrames()
     {
+        systems.OneFrame<DropPieceEvent>();
     }
 
     private void Update()
     {
+        pixelPerMeter = gameBoard.rect.width / boardInitializer.width;
+
         systems.Run();
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // Quit the application
+            Application.Quit();
+        }
     }
 
     private void OnDestroy()
