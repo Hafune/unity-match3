@@ -126,15 +126,7 @@
 
                     if (free.Get<PositionComponent>().vec != pos) continue;
 
-                    var piece = free.Get<PieceComponent>().piece;
                     free.Get<DestroyComponent>();
-
-                    var entity = world.NewEntity();
-                    entity.Get<FallPositionComponent>().vec = pos;
-                    entity.Get<FallPieceComponent>().piece = piece;
-
-                    piece.canvasRenderer.transform.SetAsLastSibling();
-                    piece.blocked = true;
 
                     myEngine.valuesBoard[(int) position.x, (int) position.y] = null;
                 }

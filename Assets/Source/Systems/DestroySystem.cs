@@ -1,4 +1,6 @@
-﻿namespace Source.Systems
+﻿using System.Collections.Generic;
+
+namespace Source.Systems
 {
     using Leopotam.Ecs;
     using Components;
@@ -7,6 +9,8 @@
     {
         private readonly EcsFilter<DestroyComponent, PositionComponent> entities = null!;
         private readonly EcsFilter<PieceComponent, RollbackComponent> entitiesWithRollBack = null!;
+        
+        private readonly EcsWorld world = null!;
         private readonly MyEngine myEngine;
 
         public DestroySystem(MyEngine myEngine)
@@ -35,13 +39,25 @@
             
                 entity.Get<PieceComponent>().piece.blocked = false;
             }
-            
+
             foreach (var i in entities)
             {
                 ref var entity = ref entities.GetEntity(i);
                 ref var vec = ref entity.Get<PositionComponent>().vec;
-
                 var _ = new SpawnPiece(myEngine, vec.x, vec.y);
+            }
+
+            foreach (var i in entities)
+            {
+                ref var entity = ref entities.GetEntity(i);
+                ref var piece = ref entity.Get<PieceComponent>().piece;
+                ref var vec = ref entity.Get<PositionComponent>().vec;
+
+                var newEntity = world.NewEntity();
+                newEntity.Get<FallPositionComponent>().vec = vec;
+                newEntity.Get<FallPieceComponent>().piece = piece;
+                piece.canvasRenderer.transform.SetAsLastSibling();
+                
                 entity.Destroy();
             }
         }
