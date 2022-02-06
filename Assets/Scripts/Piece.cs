@@ -45,4 +45,10 @@ public class Piece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         isDragged = true;
         drag += eventData.delta / canvas.scaleFactor / ecs.pixelPerMeter;
     }
+    
+    public void DestroyScriptInstance()
+    {
+        Destroy(this);
+        Destroy(img);
+    }
 }

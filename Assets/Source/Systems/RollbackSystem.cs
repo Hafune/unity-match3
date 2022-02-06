@@ -16,6 +16,13 @@ namespace Source.Systems
             >
             entities = null!;
 
+        private readonly MyEngine myEngine;
+
+        public RollbackSystem(MyEngine myEngine)
+        {
+            this.myEngine = myEngine;
+        }
+
         public void Run()
         {
             if (entities.GetEntitiesCount() < 2) return;
@@ -28,15 +35,17 @@ namespace Source.Systems
                 for (var i = 0; i < entities.GetEntitiesCount(); i++)
                 {
                     if (rollback.pair != entities.GetEntity(i)) continue;
-                    
-                    ref var piece = ref entity.Get<PieceComponent>().piece;
+
+                    ref var piece = ref entity.Get<PieceComponent>();
                     ref var position = ref entity.Get<PositionComponent>().vec;
-                        
-                    piece.drag = position - rollback.vec;
-                    position.Set(rollback.vec.x, rollback.vec.y);
                     
+                    piece.piece.drag = position - rollback.vec;
+                    position.Set(rollback.vec.x, rollback.vec.y);
+
                     entity.Del<RollbackComponent>();
                     entity.Del<ReadyToRollBackComponent>();
+
+                    myEngine.valuesBoard[(int) position.x, (int) position.y] = piece.value;
                 }
             }
         }

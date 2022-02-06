@@ -14,7 +14,7 @@
         // private readonly EcsWorld world = null!;
 
         //Auto inject
-        private readonly EcsFilter<PositionComponent, PieceComponent, FallComponent> entities = null!;
+        private readonly EcsFilter<FallPieceComponent, FallPositionComponent> entities = null!;
 
         public FallSystem(MyEngine myEngine)
         {
@@ -27,13 +27,17 @@
             foreach (var i in entities)
             {
                 ref var entity = ref entities.GetEntity(i);
-                ref var piece = ref entity.Get<PieceComponent>().piece;
+                ref var piece = ref entity.Get<FallPieceComponent>().piece;
 
 
                 var rectAnchoredPosition = piece.rect.anchoredPosition;
-                rectAnchoredPosition.y -= 50 * Time.deltaTime;
+                rectAnchoredPosition.y -= 150 * Time.deltaTime;
                 piece.rect.anchoredPosition = rectAnchoredPosition;
-                Debug.Log("VAR");
+
+                if (!(rectAnchoredPosition.y < -piece.rect.rect.height)) continue;
+
+                piece.DestroyScriptInstance();
+                entity.Destroy();
             }
         }
     }

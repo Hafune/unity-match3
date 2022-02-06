@@ -47,9 +47,9 @@
 
                     if (drag.magnitude == 0)
                     {
-                        if (entity.Has<RollbackComponent>())
+                        if (entity.Has<RollbackComponent>() || entity.Has<StartComponent>())
                         {
-                            entity.Get<CheckMatchComponent>();
+                            entity.Get<ReadyToMatchComponent>();
                         }
                         else piece.blocked = false;
                     }

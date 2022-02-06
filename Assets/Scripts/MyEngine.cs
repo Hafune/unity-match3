@@ -44,9 +44,10 @@ public class MyEngine : MonoBehaviour
     private void AddSystems()
     {
         systems.Add(new MatchSystem(this));
+        systems.Add(new DestroySystem(this));
         systems.Add(new DropPieceSystem());
         systems.Add(new MovePieceSystem(this));
-        systems.Add(new RollbackSystem());
+        systems.Add(new RollbackSystem(this));
         systems.Add(new FallSystem(this));
     }
 

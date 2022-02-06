@@ -1,7 +1,6 @@
 ﻿namespace Source.Components
 {
-    public struct FallComponent
+    public struct ReadyToMatchComponent
     {
-        
     }
 }

@@ -7,31 +7,41 @@
 
     internal sealed class MatchSystem : IEcsRunSystem
     {
-        private readonly bool[,] patternA = new bool[3, 3]
+        private readonly bool[,] patternA = 
         {
-            {false, true, false},
-            {true, true, true},
-            {false, true, false}
+            {true, true},
+            {true, true}
         };
 
-        private readonly bool[,] patternB = new bool[1, 3]
-        {
+        private readonly bool[,] patternB = {
             {true, true, true},
         };
 
-        private readonly bool[,] patternC = new bool[3, 1]
-        {
+        private readonly bool[,] patternC = {
             {true},
             {true},
             {true},
         };
+
+        private readonly EcsWorld world = null!;
 
         private readonly List<bool[,]> patterns;
 
-        private readonly EcsFilter<RollbackComponent, PositionComponent, PieceComponent, CheckMatchComponent> entities =
-            null!;
+        private readonly EcsFilter<
+            StartComponent,
+            ReadyToMatchComponent,
+            PositionComponent,
+            PieceComponent
+        > newEntities = null!;
 
-        private readonly EcsFilter<PositionComponent>.Exclude<FallComponent> freeEntities =
+        private readonly EcsFilter<
+            ReadyToMatchComponent,
+            RollbackComponent,
+            PositionComponent,
+            PieceComponent
+        > entities = null!;
+
+        private readonly EcsFilter<PositionComponent>.Exclude<FallPositionComponent> freeEntities =
             null!;
 
         private readonly MyEngine myEngine;
@@ -50,52 +60,111 @@
 
         public void Run()
         {
-            foreach (var i in entities)
+            foreach (var e in newEntities)
             {
-                ref var entity = ref entities.GetEntity(i);
+                ref var entity = ref newEntities.GetEntity(e);
+                ref var position = ref entity.Get<PositionComponent>().vec;
+                ref var piece = ref entity.Get<PieceComponent>();
+                
+                entity.Del<StartComponent>();
+                entity.Del<ReadyToMatchComponent>();
+
+                piece.piece.blocked = checkPatterns(position, piece.value);
+            }
+
+            if (entities.GetEntitiesCount() < 2) return;
+
+            foreach (var e in entities)
+            {
+                ref var entity = ref entities.GetEntity(e);
+                ref var rollback = ref entity.Get<RollbackComponent>();
+
+                EcsEntity? p = null;
+                for (var i = 0; i < entities.GetEntitiesCount(); i++)
+                {
+                    if (rollback.pair != entities.GetEntity(i)) continue;
+                    p = rollback.pair;
+                    break;
+                }
+
+                if (p == null) continue;
+                var pair = (EcsEntity) p;
+
                 ref var position = ref entity.Get<PositionComponent>().vec;
                 ref var piece = ref entity.Get<PieceComponent>();
 
-                entity.Del<CheckMatchComponent>();
+                ref var pairPos = ref pair.Get<PositionComponent>().vec;
+                ref var pairPiece = ref pair.Get<PieceComponent>();
 
+                myEngine.valuesBoard[(int) position.x, (int) position.y] = piece.value;
+                myEngine.valuesBoard[(int) pairPos.x, (int) pairPos.y] = pairPiece.value;
+
+                entity.Del<ReadyToMatchComponent>();
+                
+                if (checkPatterns(position, piece.value)) continue;
                 entity.Get<ReadyToRollBackComponent>();
-                checkPatterns(position, piece.value);
             }
         }
 
-        private void checkPatterns(Vector2 position, int key)
+        private bool checkPatterns(Vector2 position, int key)
         {
+            var set = new HashSet<string>();
+            var total = new List<int>();
+
             foreach (var pattern in patterns)
             {
-                checkPatternAllState(pattern, position, key);
+                checkPatternAllState(pattern, position, key, set, total);
             }
+
+            for (var i = 0; i < total.Count; i += 2)
+            {
+                var pos = new Vector2(total[i], total[i + 1]);
+
+                foreach (var o in freeEntities)
+                {
+                    var free = freeEntities.GetEntity(o);
+
+                    if (free.Get<PositionComponent>().vec != pos) continue;
+
+                    var piece = free.Get<PieceComponent>().piece;
+                    free.Get<DestroyComponent>();
+
+                    var entity = world.NewEntity();
+                    entity.Get<FallPositionComponent>().vec = pos;
+                    entity.Get<FallPieceComponent>().piece = piece;
+
+                    piece.canvasRenderer.transform.SetAsLastSibling();
+                    piece.blocked = true;
+
+                    myEngine.valuesBoard[(int) position.x, (int) position.y] = null;
+                }
+            }
+
+            return total.Count > 0;
         }
 
-        private void checkPatternAllState(bool[,] pattern, Vector2 position, int key)
+        private void checkPatternAllState(bool[,] pattern, Vector2 position, int key, ISet<string> set,
+            ICollection<int> total)
         {
-            for (var x = 0; x < pattern.GetLength(0); x++)
+            for (var x = 0; x < pattern.GetLength(1); x++)
             {
-                for (var y = 0; y < pattern.GetLength(1); y++)
+                for (var y = 0; y < pattern.GetLength(0); y++)
                 {
-                    if (!pattern[x, y]) continue;
-                    var vec = new Vector2(x + position.x, y + position.y);
+                    if (!pattern[y, x]) continue;
+
+                    var vec = new Vector2(-x + position.x, -y + position.y);
 
                     var list = checkPattern(pattern, vec, key);
+
                     if (list == null) continue;
 
                     for (var i = 0; i < list.Count; i += 2)
                     {
-                        var pos = new Vector2(list[i], list[i + 1]);
+                        var str = $"{list[i]}:{list[i + 1]}";
+                        if (!set.Add(str)) continue;
 
-                        foreach (var o in freeEntities)
-                        {
-                            var free = freeEntities.GetEntity(o);
-
-                            if (free.Get<PositionComponent>().vec != pos) continue;
-                            
-                            free.Get<FallComponent>();
-                            Debug.Log("FallComponent");
-                        }
+                        total.Add(list[i]);
+                        total.Add(list[i + 1]);
                     }
                 }
             }
@@ -105,11 +174,11 @@
         {
             var list = new List<int>();
 
-            for (var x = 0; x < pattern.GetLength(0); x++)
+            for (var x = 0; x < pattern.GetLength(1); x++)
             {
-                for (var y = 0; y < pattern.GetLength(1); y++)
+                for (var y = 0; y < pattern.GetLength(0); y++)
                 {
-                    if (!pattern[x, y]) continue;
+                    if (!pattern[y, x]) continue;
                     var vec = new Vector2(x + position.x, y + position.y);
 
                     var board = myEngine.valuesBoard;
@@ -117,7 +186,8 @@
                         vec.y < 0 ||
                         vec.x >= board.GetLength(0) ||
                         vec.y >= board.GetLength(1)) return null;
-                    if (board[(int) vec.x, (int) vec.y] != key) return null;
+                    var val = board[(int) vec.x, (int) vec.y];
+                    if (val != key) return null;
                     list.Add((int) vec.x);
                     list.Add((int) vec.y);
                 }
