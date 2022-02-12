@@ -1,7 +1,5 @@
 ﻿using Object = UnityEngine.Object;
 
-namespace Source
-{
     public class BoardInitializer : Object
     {
         public readonly int width = 9;
@@ -20,4 +18,3 @@ namespace Source
             }
         }
     }
-}

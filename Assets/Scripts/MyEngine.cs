@@ -1,7 +1,7 @@
 using Leopotam.Ecs;
-using Source;
 using UnityEngine;
 using Voody.UniLeo;
+using Random = System.Random;
 
 public class MyEngine : MonoBehaviour
 {
@@ -18,6 +18,7 @@ public class MyEngine : MonoBehaviour
     public int?[,] valuesBoard = null!;
 
     public float pixelPerMeter { get; private set; }
+    public static readonly Random random = new Random();
 
     private void Start()
     {
@@ -48,7 +49,7 @@ public class MyEngine : MonoBehaviour
         systems.Add(new MatchSystem(this));
         systems.Add(new DestroySystem(this));
         systems.Add(new RollbackSystem(this));
-        systems.Add(new FallSystem());
+        systems.Add(new FallSystem(this));
     }
 
     private void AddOneFrames()

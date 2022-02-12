@@ -91,6 +91,10 @@ MonoBehaviour:
   canvas: {fileID: 0}
   rect: {fileID: 0}
   img: {fileID: 0}
-  drag: {x: 0, y: 0}
-  isDragged: 0
+  dragOffset: {x: 0, y: 0}
   canvasRenderer: {fileID: 5114957395452692392}
+  isDragged: 0
+  justPointerUp: 0
+  isBlocked: 0
+  fallSpeed: 5.09
+  horizontalSpread: 2

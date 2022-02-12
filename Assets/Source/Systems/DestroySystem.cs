@@ -1,5 +1,5 @@
 ﻿using Leopotam.Ecs;
-using Source;
+using UnityEngine;
 
 internal sealed class DestroySystem : IEcsRunSystem
 {
@@ -28,9 +28,17 @@ internal sealed class DestroySystem : IEcsRunSystem
             ref var piece = ref entity.Get<PieceComponent>().piece;
 
             var fallEntity = world.NewEntity();
-            fallEntity.Get<FallPositionComponent>().vec = entity.Get<PositionComponent>().vec;
+            fallEntity.Get<FallPositionComponent>().position =
+                entity.Get<PositionComponent>().vec + new Vector2(.5f, .5f);
+
+            fallEntity.Get<FallPositionComponent>().vec = new Vector2(
+                (float) (MyEngine.random.NextDouble() * (piece.horizontalSpread * 2f) - piece.horizontalSpread),
+                (float) (MyEngine.random.NextDouble() * 2f));
+
             fallEntity.Get<FallPieceComponent>().piece = piece;
+
             piece.transform.SetParent(myEngine.fallBoard);
+            piece.img.raycastTarget = false;
 
             entity.Destroy();
         }

@@ -31,7 +31,7 @@ internal sealed class RollbackSystem : IEcsRunSystem
                 ref var position = ref entity.Get<PositionComponent>().vec;
 
                 pieceComponent.piece.dragOffset = position - rollback.backPosition;
-                pieceComponent.piece.blocked = true;
+                pieceComponent.piece.isBlocked = true;
 
                 position.Set(rollback.backPosition.x, rollback.backPosition.y);
                 entity.Get<MoveComponent>();

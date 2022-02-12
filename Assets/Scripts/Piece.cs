@@ -11,9 +11,12 @@ public class Piece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     [HideInInspector] public Vector2 dragOffset;
     public CanvasRenderer canvasRenderer = null!;
 
-    public bool isDragged;
-    public bool justPointerUp;
-    public bool blocked;
+    [HideInInspector] public bool isDragged;
+    [HideInInspector] public bool justPointerUp;
+    [HideInInspector] public bool isBlocked;
+
+    [Range(0.1f, 10f)] public float fallSpeed = 3f;
+    [Range(0f, 10f)] public float horizontalSpread = 2f;
 
     private MyEngine ecs = null!;
 
@@ -32,20 +35,20 @@ public class Piece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        if (blocked) return;
-        
+        if (isBlocked) return;
+
         isDragged = false;
         justPointerUp = true;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (blocked) return;
-        
+        if (isBlocked) return;
+
         isDragged = true;
         dragOffset += eventData.delta / canvas.scaleFactor / ecs.pixelPerMeter;
     }
-    
+
     public void DestroyScriptInstance()
     {
         Destroy(this);

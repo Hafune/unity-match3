@@ -25,7 +25,7 @@ internal sealed class DropPieceSystem : IEcsRunSystem
 
             if (!piece.justPointerUp) continue;
 
-            piece.blocked = true;
+            piece.isBlocked = true;
             piece.isDragged = false;
             piece.justPointerUp = false;
             entity.Get<DropPieceEvent>();
@@ -63,7 +63,7 @@ internal sealed class DropPieceSystem : IEcsRunSystem
             ref var pieceComponent = ref entity.Get<PieceComponent>();
 
             if (position != point) continue;
-            if (pieceComponent.piece.blocked) continue;
+            if (pieceComponent.piece.isBlocked) continue;
 
             pieceComponent.piece.canvasRenderer.transform.SetAsLastSibling();
 
@@ -71,7 +71,7 @@ internal sealed class DropPieceSystem : IEcsRunSystem
             entity.Get<AwaitPairComponent>().pair = pair;
 
             pieceComponent.piece.dragOffset = position - from;
-            pieceComponent.piece.blocked = true;
+            pieceComponent.piece.isBlocked = true;
 
             position.Set(from.x, from.y);
             entity.Get<MoveComponent>();

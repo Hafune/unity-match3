@@ -42,7 +42,7 @@ internal sealed class MovePieceSystem : IEcsRunSystem
                 {
                     entity.Get<MatchComponent>();
                     entity.Del<MoveComponent>();
-                    piece.blocked = false;
+                    piece.isBlocked = false;
                 }
             }
 
