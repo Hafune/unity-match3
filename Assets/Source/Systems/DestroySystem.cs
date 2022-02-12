@@ -1,41 +1,38 @@
-﻿namespace Source.Systems
+﻿using Leopotam.Ecs;
+using Source;
+
+internal sealed class DestroySystem : IEcsRunSystem
 {
-    using Leopotam.Ecs;
-    using Components;
+    private readonly EcsFilter<DestroyComponent, PositionComponent> entities = null!;
 
-    internal sealed class DestroySystem : IEcsRunSystem
+    private readonly EcsWorld world = null!;
+    private readonly MyEngine myEngine;
+
+    public DestroySystem(MyEngine myEngine)
     {
-        private readonly EcsFilter<DestroyComponent, PositionComponent> entities = null!;
+        this.myEngine = myEngine;
+    }
 
-        private readonly EcsWorld world = null!;
-        private readonly MyEngine myEngine;
-
-        public DestroySystem(MyEngine myEngine)
+    public void Run()
+    {
+        foreach (var i in entities)
         {
-            this.myEngine = myEngine;
+            ref var entity = ref entities.GetEntity(i);
+            ref var vec = ref entity.Get<PositionComponent>().vec;
+            var _ = new SpawnPiece(myEngine, vec.x, vec.y);
         }
 
-        public void Run()
+        foreach (var i in entities)
         {
-            foreach (var i in entities)
-            {
-                ref var entity = ref entities.GetEntity(i);
-                ref var vec = ref entity.Get<PositionComponent>().vec;
-                var _ = new SpawnPiece(myEngine, vec.x, vec.y);
-            }
+            ref var entity = ref entities.GetEntity(i);
+            ref var piece = ref entity.Get<PieceComponent>().piece;
 
-            foreach (var i in entities)
-            {
-                ref var entity = ref entities.GetEntity(i);
-                ref var piece = ref entity.Get<PieceComponent>().piece;
+            var fallEntity = world.NewEntity();
+            fallEntity.Get<FallPositionComponent>().vec = entity.Get<PositionComponent>().vec;
+            fallEntity.Get<FallPieceComponent>().piece = piece;
+            piece.transform.SetParent(myEngine.fallBoard);
 
-                var fallEntity = world.NewEntity();
-                fallEntity.Get<FallPositionComponent>().vec = entity.Get<PositionComponent>().vec;
-                fallEntity.Get<FallPieceComponent>().piece = piece;
-                piece.transform.SetParent(myEngine.fallBoard);
-
-                entity.Destroy();
-            }
+            entity.Destroy();
         }
     }
 }

@@ -1,30 +1,26 @@
-﻿namespace Source.Systems
+﻿using Leopotam.Ecs;
+using UnityEngine;
+
+internal sealed class FallSystem : IEcsRunSystem
 {
-    using Leopotam.Ecs;
-    using Components;
-    using UnityEngine;
+    private readonly EcsFilter<FallPieceComponent, FallPositionComponent> entities = null!;
 
-    internal sealed class FallSystem : IEcsRunSystem
+    public void Run()
     {
-        private readonly EcsFilter<FallPieceComponent, FallPositionComponent> entities = null!;
-
-        public void Run()
+        foreach (var i in entities)
         {
-            foreach (var i in entities)
-            {
-                ref var entity = ref entities.GetEntity(i);
-                ref var piece = ref entity.Get<FallPieceComponent>().piece;
+            ref var entity = ref entities.GetEntity(i);
+            ref var piece = ref entity.Get<FallPieceComponent>().piece;
 
 
-                var rectAnchoredPosition = piece.rect.anchoredPosition;
-                rectAnchoredPosition.y -= 150 * Time.deltaTime;
-                piece.rect.anchoredPosition = rectAnchoredPosition;
+            var rectAnchoredPosition = piece.rect.anchoredPosition;
+            rectAnchoredPosition.y -= 150 * Time.deltaTime;
+            piece.rect.anchoredPosition = rectAnchoredPosition;
 
-                if (!(rectAnchoredPosition.y < -piece.rect.rect.height)) continue;
+            if (!(rectAnchoredPosition.y < -piece.rect.rect.height)) continue;
 
-                piece.DestroyScriptInstance();
-                entity.Destroy();
-            }
+            piece.DestroyScriptInstance();
+            entity.Destroy();
         }
     }
 }

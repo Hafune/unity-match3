@@ -1,49 +1,45 @@
-﻿namespace Source.Systems
+﻿using Leopotam.Ecs;
+
+internal sealed class RollbackSystem : IEcsRunSystem
 {
-    using Leopotam.Ecs;
-    using Components;
+    private readonly EcsFilter<
+            PieceComponent,
+            PositionComponent,
+            RollbackComponent
+        >
+        entities = null!;
 
-    internal sealed class RollbackSystem : IEcsRunSystem
+    private readonly MyEngine myEngine;
+
+    private readonly FindPair findPair = new FindPair();
+
+    public RollbackSystem(MyEngine myEngine)
     {
-        private readonly EcsFilter<
-                PieceComponent,
-                PositionComponent,
-                RollbackComponent
-            >
-            entities = null!;
+        this.myEngine = myEngine;
+    }
 
-        private readonly MyEngine myEngine;
-
-        private readonly FindPair findPair = new FindPair();
-
-        public RollbackSystem(MyEngine myEngine)
+    public void Run()
+    {
+        foreach (var e in entities)
         {
-            this.myEngine = myEngine;
-        }
+            ref var entity = ref entities.GetEntity(e);
+            ref var rollback = ref entity.Get<RollbackComponent>();
+            ref var pieceComponent = ref entity.Get<PieceComponent>();
 
-        public void Run()
-        {
-            foreach (var e in entities)
+            if (findPair.find(rollback.pair, entities) != null)
             {
-                ref var entity = ref entities.GetEntity(e);
-                ref var rollback = ref entity.Get<RollbackComponent>();
-                ref var pieceComponent = ref entity.Get<PieceComponent>();
+                ref var position = ref entity.Get<PositionComponent>().vec;
 
-                if (findPair.find(rollback.pair, entities) != null)
-                {
-                    ref var position = ref entity.Get<PositionComponent>().vec;
+                pieceComponent.piece.dragOffset = position - rollback.backPosition;
+                pieceComponent.piece.blocked = true;
 
-                    pieceComponent.piece.dragOffset = position - rollback.backPosition;
-                    pieceComponent.piece.blocked = true;
-                    
-                    position.Set(rollback.backPosition.x, rollback.backPosition.y);
-                    entity.Get<MoveComponent>();
+                position.Set(rollback.backPosition.x, rollback.backPosition.y);
+                entity.Get<MoveComponent>();
 
-                    myEngine.valuesBoard[(int) position.x, (int) position.y] = pieceComponent.value;
-                }
-
-                entity.Del<RollbackComponent>();
+                myEngine.valuesBoard[(int) position.x, (int) position.y] = pieceComponent.value;
             }
+
+            entity.Del<RollbackComponent>();
         }
     }
 }

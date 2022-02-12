@@ -1,9 +1,6 @@
-﻿namespace Source.Components
-{
-    using UnityEngine;
+﻿using UnityEngine;
 
-    public struct PositionComponent
-    {
-        public Vector2 vec;
-    }
+public struct PositionComponent
+{
+    public Vector2 vec;
 }

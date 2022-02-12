@@ -1,30 +1,26 @@
-﻿namespace Source.Systems
+﻿using Leopotam.Ecs;
+
+internal sealed class AwaitPairSystem : IEcsRunSystem
 {
-    using Leopotam.Ecs;
-    using Components;
+    private readonly EcsFilter<AwaitPairComponent, MatchComponent> entities = null!;
 
-    internal sealed class AwaitPairSystem : IEcsRunSystem
+    private readonly FindPair findPair = new FindPair();
+
+    public void Run()
     {
-        private readonly EcsFilter<AwaitPairComponent, MatchComponent> entities = null!;
+        if (entities.GetEntitiesCount() < 2) return;
 
-        private readonly FindPair findPair = new FindPair();
-
-        public void Run()
+        foreach (var e in entities)
         {
-            if (entities.GetEntitiesCount() < 2) return;
+            ref var entity = ref entities.GetEntity(e);
+            ref var pairComponent = ref entity.Get<AwaitPairComponent>();
 
-            foreach (var e in entities)
-            {
-                ref var entity = ref entities.GetEntity(e);
-                ref var pairComponent = ref entity.Get<AwaitPairComponent>();
+            if (findPair.find(pairComponent.pair, entities) == null) continue;
 
-                if (findPair.find(pairComponent.pair, entities) == null) continue;
+            entity.Get<RollbackComponent>().backPosition = pairComponent.startPosition;
+            entity.Get<RollbackComponent>().pair = pairComponent.pair;
 
-                entity.Get<RollbackComponent>().backPosition = pairComponent.startPosition;
-                entity.Get<RollbackComponent>().pair = pairComponent.pair;
-
-                entity.Del<AwaitPairComponent>();
-            }
+            entity.Del<AwaitPairComponent>();
         }
     }
 }

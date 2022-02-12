@@ -1,6 +1,3 @@
-﻿namespace Source.Components
+﻿public struct MoveComponent
 {
-    public struct MoveComponent
-    {
-    }
 }

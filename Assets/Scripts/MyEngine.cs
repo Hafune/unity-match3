@@ -1,7 +1,5 @@
 using Leopotam.Ecs;
 using Source;
-using Source.Components;
-using Source.Systems;
 using UnityEngine;
 using Voody.UniLeo;
 

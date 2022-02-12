@@ -1,6 +1,5 @@
 ﻿using System;
 using Leopotam.Ecs;
-using Source.Components;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using Random = System.Random;
