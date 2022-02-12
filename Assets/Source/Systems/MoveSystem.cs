@@ -10,11 +10,7 @@
         private readonly Rect boardRect;
         private readonly MyEngine myEngine;
 
-        //Auto inject
-        // private readonly EcsWorld world = null!;
-
-        //Auto inject
-        private readonly EcsFilter<PositionComponent, PieceComponent> entities = null!;
+        private readonly EcsFilter<MoveComponent, PositionComponent, PieceComponent> entities = null!;
 
         public MovePieceSystem(MyEngine myEngine)
         {
@@ -37,9 +33,9 @@
                 ref var position = ref entity.Get<PositionComponent>().vec;
                 ref var piece = ref entity.Get<PieceComponent>().piece;
 
-                ref var drag = ref piece.drag;
+                ref var drag = ref piece.dragOffset;
 
-                if (!piece.isDragged && (drag.magnitude > 0))
+                if (!piece.isDragged)
                 {
                     drag -= drag * Time.deltaTime * 20;
                     if (Math.Abs(drag.x) < .01) drag.x = 0f;
@@ -47,19 +43,17 @@
 
                     if (drag.magnitude == 0)
                     {
-                        if (entity.Has<RollbackComponent>() || entity.Has<StartComponent>())
-                        {
-                            entity.Get<ReadyToMatchComponent>();
-                        }
-                        else piece.blocked = false;
+                        entity.Get<MatchComponent>();
+                        entity.Del<MoveComponent>();
+                        piece.blocked = false;
                     }
                 }
-                
+
                 var vec = new Vector2(position.x * rect.width / width + halfWidth,
                     position.y * rect.height / height + halfHeight);
 
                 piece.rect.anchoredPosition =
-                    vec + piece.drag * myEngine.pixelPerMeter;
+                    vec + piece.dragOffset * myEngine.pixelPerMeter;
             }
         }
     }

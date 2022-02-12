@@ -8,7 +8,7 @@ public class Piece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
     [HideInInspector] public RectTransform rect = null!;
     [HideInInspector] public Image img = null!;
 
-    [HideInInspector] public Vector2 drag;
+    [HideInInspector] public Vector2 dragOffset;
     public CanvasRenderer canvasRenderer = null!;
 
     public bool isDragged;
@@ -43,7 +43,7 @@ public class Piece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDra
         if (blocked) return;
         
         isDragged = true;
-        drag += eventData.delta / canvas.scaleFactor / ecs.pixelPerMeter;
+        dragOffset += eventData.delta / canvas.scaleFactor / ecs.pixelPerMeter;
     }
     
     public void DestroyScriptInstance()

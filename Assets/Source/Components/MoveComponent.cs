@@ -1,6 +1,6 @@
 ﻿namespace Source.Components
 {
-    public struct DropPieceEvent
+    public struct MoveComponent
     {
     }
 }

@@ -23,23 +23,13 @@
             {true},
         };
 
-        private readonly EcsWorld world = null!;
-
         private readonly List<bool[,]> patterns;
 
         private readonly EcsFilter<
-            StartComponent,
-            ReadyToMatchComponent,
+            MatchComponent,
             PositionComponent,
             PieceComponent
-        > newEntities = null!;
-
-        private readonly EcsFilter<
-            ReadyToMatchComponent,
-            RollbackComponent,
-            PositionComponent,
-            PieceComponent
-        > entities = null!;
+        >.Exclude<AwaitPairComponent> entities = null!;
 
         private readonly EcsFilter<PositionComponent>.Exclude<FallPositionComponent> freeEntities =
             null!;
@@ -60,53 +50,22 @@
 
         public void Run()
         {
-            foreach (var e in newEntities)
-            {
-                ref var entity = ref newEntities.GetEntity(e);
-                ref var position = ref entity.Get<PositionComponent>().vec;
-                ref var piece = ref entity.Get<PieceComponent>();
-                
-                entity.Del<StartComponent>();
-                entity.Del<ReadyToMatchComponent>();
-
-                piece.piece.blocked = checkPatterns(position, piece.value);
-            }
-
             if (entities.GetEntitiesCount() < 2) return;
 
             foreach (var e in entities)
             {
                 ref var entity = ref entities.GetEntity(e);
-                ref var rollback = ref entity.Get<RollbackComponent>();
-
-                EcsEntity? p = null;
-                for (var i = 0; i < entities.GetEntitiesCount(); i++)
-                {
-                    if (rollback.pair != entities.GetEntity(i)) continue;
-                    p = rollback.pair;
-                    break;
-                }
-
-                if (p == null) continue;
-                var pair = (EcsEntity) p;
-
+                
                 ref var position = ref entity.Get<PositionComponent>().vec;
                 ref var piece = ref entity.Get<PieceComponent>();
 
-                ref var pairPos = ref pair.Get<PositionComponent>().vec;
-                ref var pairPiece = ref pair.Get<PieceComponent>();
-
-                myEngine.valuesBoard[(int) position.x, (int) position.y] = piece.value;
-                myEngine.valuesBoard[(int) pairPos.x, (int) pairPos.y] = pairPiece.value;
-
-                entity.Del<ReadyToMatchComponent>();
+                entity.Del<MatchComponent>();
                 
-                if (checkPatterns(position, piece.value)) continue;
-                entity.Get<ReadyToRollBackComponent>();
+                checkPatterns(position, piece.value);
             }
         }
 
-        private bool checkPatterns(Vector2 position, int key)
+        private void checkPatterns(Vector2 position, int key)
         {
             var set = new HashSet<string>();
             var total = new List<int>();
@@ -131,8 +90,6 @@
                     myEngine.valuesBoard[(int) position.x, (int) position.y] = null;
                 }
             }
-
-            return total.Count > 0;
         }
 
         private void checkPatternAllState(bool[,] pattern, Vector2 position, int key, ISet<string> set,

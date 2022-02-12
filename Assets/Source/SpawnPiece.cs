@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Leopotam.Ecs;
 using Source.Components;
 using UnityEngine;
@@ -21,8 +20,8 @@ namespace Source
 
             var canvas = gameBoard.parent.GetComponent<Canvas>();
             var entity = world.NewEntity();
-            entity.Get<StartComponent>();
             
+            entity.Get<MoveComponent>();
             ref var position = ref entity.Get<PositionComponent>();
             ref var piece = ref entity.Get<PieceComponent>();
 
@@ -42,7 +41,7 @@ namespace Source
             piece.piece.rect.anchoredPosition = position.vec;
 
             piece.piece.blocked = true;
-            piece.piece.drag = new Vector2((float) (random.NextDouble() * 4f - 2),
+            piece.piece.dragOffset = new Vector2((float) (random.NextDouble() * 4f - 2),
                 (float) (random.NextDouble() * 4f - 2));
         }
     }

@@ -8,13 +8,16 @@ namespace Source.Systems
 
     internal sealed class DropPieceSystem : IEcsRunSystem
     {
-        //Auto inject
-        // private readonly EcsWorld world = null!;
+        private readonly MyEngine myEngine;
 
-        //Auto inject
         private readonly EcsFilter<PieceComponent> justDroppedEntities = null!;
         private readonly EcsFilter<PositionComponent, PieceComponent, DropPieceEvent> droppedEntities = null!;
         private readonly EcsFilter<PositionComponent, PieceComponent>.Exclude<DropPieceEvent> entities = null!;
+
+        public DropPieceSystem(MyEngine myEngine)
+        {
+            this.myEngine = myEngine;
+        }
 
         public void Run()
         {
@@ -22,31 +25,36 @@ namespace Source.Systems
             {
                 ref var entity = ref justDroppedEntities.GetEntity(i);
                 ref var piece = ref entity.Get<PieceComponent>().piece;
-
+                if (piece.isDragged) entity.Get<MoveComponent>();
+                
                 if (!piece.justPointerUp) continue;
+                
                 piece.blocked = true;
                 piece.isDragged = false;
                 piece.justPointerUp = false;
                 entity.Get<DropPieceEvent>();
             }
-                
-                
+
             foreach (var i in droppedEntities)
             {
                 ref var entity = ref droppedEntities.GetEntity(i);
                 ref var position = ref entity.Get<PositionComponent>().vec;
-                ref var piece = ref entity.Get<PieceComponent>().piece;
-                ref var drag = ref piece.drag;
+                ref var pieceComponent = ref entity.Get<PieceComponent>();
+                ref var drag = ref pieceComponent.piece.dragOffset;
                 var roundPosition = position + new Vector2((float) Math.Round(drag.x), (float) Math.Round(drag.y));
 
-                var nullableEntity = switchIfExist(entity, roundPosition, position);
-                if (nullableEntity == null) continue;
+                var pair = switchIfExist(pair: entity, point: roundPosition, from: position);
+                if (pair == null) continue;
 
-                entity.Get<RollbackComponent>().vec = position;
-                entity.Get<RollbackComponent>().pair = (EcsEntity) nullableEntity;
+                entity.Get<AwaitPairComponent>().startPosition = position;
+                entity.Get<AwaitPairComponent>().pair = (EcsEntity) pair;
 
-                piece.drag = position + drag - roundPosition;
+                pieceComponent.piece.dragOffset = position + drag - roundPosition;
+
                 position.Set(roundPosition.x, roundPosition.y);
+                entity.Get<MoveComponent>();
+
+                myEngine.valuesBoard[(int) position.x, (int) position.y] = pieceComponent.value;
             }
         }
 
@@ -56,19 +64,23 @@ namespace Source.Systems
             {
                 ref var entity = ref entities.GetEntity(i);
                 ref var position = ref entity.Get<PositionComponent>().vec;
-                ref var piece = ref entity.Get<PieceComponent>().piece;
-                
+                ref var pieceComponent = ref entity.Get<PieceComponent>();
+
                 if (position != point) continue;
-                if (piece.blocked) continue;
+                if (pieceComponent.piece.blocked) continue;
 
-                piece.canvasRenderer.transform.SetAsLastSibling();
+                pieceComponent.piece.canvasRenderer.transform.SetAsLastSibling();
 
-                entity.Get<RollbackComponent>().vec = position;
-                entity.Get<RollbackComponent>().pair = pair;
+                entity.Get<AwaitPairComponent>().startPosition = position;
+                entity.Get<AwaitPairComponent>().pair = pair;
 
-                piece.drag = position - from;
+                pieceComponent.piece.dragOffset = position - from;
+                pieceComponent.piece.blocked = true;
+
                 position.Set(from.x, from.y);
-                piece.blocked = true;
+                entity.Get<MoveComponent>();
+
+                myEngine.valuesBoard[(int) position.x, (int) position.y] = pieceComponent.value;
 
                 return entity;
             }

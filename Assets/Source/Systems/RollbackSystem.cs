@@ -1,7 +1,4 @@
-﻿using System;
-using UnityEngine;
-
-namespace Source.Systems
+﻿namespace Source.Systems
 {
     using Leopotam.Ecs;
     using Components;
@@ -11,12 +8,13 @@ namespace Source.Systems
         private readonly EcsFilter<
                 PieceComponent,
                 PositionComponent,
-                RollbackComponent,
-                ReadyToRollBackComponent
+                RollbackComponent
             >
             entities = null!;
 
         private readonly MyEngine myEngine;
+
+        private readonly FindPair findPair = new FindPair();
 
         public RollbackSystem(MyEngine myEngine)
         {
@@ -25,28 +23,26 @@ namespace Source.Systems
 
         public void Run()
         {
-            if (entities.GetEntitiesCount() < 2) return;
-
             foreach (var e in entities)
             {
                 ref var entity = ref entities.GetEntity(e);
                 ref var rollback = ref entity.Get<RollbackComponent>();
+                ref var pieceComponent = ref entity.Get<PieceComponent>();
 
-                for (var i = 0; i < entities.GetEntitiesCount(); i++)
+                if (findPair.find(rollback.pair, entities) != null)
                 {
-                    if (rollback.pair != entities.GetEntity(i)) continue;
-
-                    ref var piece = ref entity.Get<PieceComponent>();
                     ref var position = ref entity.Get<PositionComponent>().vec;
+
+                    pieceComponent.piece.dragOffset = position - rollback.backPosition;
+                    pieceComponent.piece.blocked = true;
                     
-                    piece.piece.drag = position - rollback.vec;
-                    position.Set(rollback.vec.x, rollback.vec.y);
+                    position.Set(rollback.backPosition.x, rollback.backPosition.y);
+                    entity.Get<MoveComponent>();
 
-                    entity.Del<RollbackComponent>();
-                    entity.Del<ReadyToRollBackComponent>();
-
-                    myEngine.valuesBoard[(int) position.x, (int) position.y] = piece.value;
+                    myEngine.valuesBoard[(int) position.x, (int) position.y] = pieceComponent.value;
                 }
+
+                entity.Del<RollbackComponent>();
             }
         }
     }

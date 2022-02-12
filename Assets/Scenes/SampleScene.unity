@@ -327,6 +327,7 @@ MonoBehaviour:
   - {fileID: -7105913188517789750, guid: 34f6321b206afab459fb7c8d37989456, type: 3}
   - {fileID: 5528609633622603068, guid: 2c97df9695607b04c92ec362851a0890, type: 3}
   gameBoard: {fileID: 741463912}
+  fallBoard: {fileID: 1647519061}
   boardInitializer: {fileID: 0}
 --- !u!4 &489296730
 Transform:
@@ -511,7 +512,7 @@ GameObject:
   - component: {fileID: 1647519061}
   - component: {fileID: 1647519062}
   m_Layer: 5
-  m_Name: KilledBoard
+  m_Name: FallBoard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

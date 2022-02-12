@@ -1,7 +1,4 @@
-﻿namespace Source.Components
+﻿public struct FallPieceComponent
 {
-    public struct FallPieceComponent
-    {
-        public Piece piece;
-    }
+    public Piece piece;
 }

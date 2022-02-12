@@ -14,7 +14,8 @@ public class MyEngine : MonoBehaviour
     public Sprite[] sprites = null!;
 
     public RectTransform gameBoard = null!;
-    public BoardInitializer boardInitializer = null!;
+    public RectTransform fallBoard = null!;
+    [HideInInspector] public BoardInitializer boardInitializer = null!;
 
     public int?[,] valuesBoard = null!;
 
@@ -43,12 +44,13 @@ public class MyEngine : MonoBehaviour
 
     private void AddSystems()
     {
+        systems.Add(new DropPieceSystem(this));
+        systems.Add(new MovePieceSystem(this));
+        systems.Add(new AwaitPairSystem());
         systems.Add(new MatchSystem(this));
         systems.Add(new DestroySystem(this));
-        systems.Add(new DropPieceSystem());
-        systems.Add(new MovePieceSystem(this));
         systems.Add(new RollbackSystem(this));
-        systems.Add(new FallSystem(this));
+        systems.Add(new FallSystem());
     }
 
     private void AddOneFrames()

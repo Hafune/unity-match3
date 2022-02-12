@@ -1,6 +1,6 @@
 ﻿namespace Source.Components
 {
-    public struct ReadyToRollBackComponent
+    public struct MatchComponent
     {
     }
 }

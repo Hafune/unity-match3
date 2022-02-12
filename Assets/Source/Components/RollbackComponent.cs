@@ -1,13 +1,11 @@
-﻿using System;
-using Leopotam.Ecs;
+﻿using Leopotam.Ecs;
+using UnityEngine;
 
 namespace Source.Components
 {
-    using UnityEngine;
-
     public struct RollbackComponent
     {
-        public Vector2 vec;
+        public Vector2 backPosition;
         public EcsEntity pair;
     }
 }
