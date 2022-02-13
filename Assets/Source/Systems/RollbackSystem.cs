@@ -1,45 +1,75 @@
-﻿using Leopotam.Ecs;
+﻿using System.Collections.Generic;
+using Leopotam.Ecs;
+using Scripts;
+using Source.Components;
+using Systems;
+using UnityEngine;
 
-internal sealed class RollbackSystem : IEcsRunSystem
+namespace Source.Systems
 {
-    private readonly EcsFilter<
-            PieceComponent,
-            PositionComponent,
-            RollbackComponent
-        >
-        entities = null!;
-
-    private readonly MyEngine myEngine;
-
-    private readonly FindPair findPair = new FindPair();
-
-    public RollbackSystem(MyEngine myEngine)
+    internal sealed class RollbackSystem : IEcsRunSystem
     {
-        this.myEngine = myEngine;
-    }
+        private readonly EcsFilter<
+                PieceComponent,
+                PositionComponent,
+                RollbackComponent
+            >
+            entities = null!;
 
-    public void Run()
-    {
-        foreach (var e in entities)
+        private readonly MyEngine myEngine;
+
+        private readonly FindPair findPair = new FindPair();
+        private readonly HashSet<EcsEntity> set = new HashSet<EcsEntity>();
+
+
+        public RollbackSystem(MyEngine myEngine)
         {
-            ref var entity = ref entities.GetEntity(e);
-            ref var rollback = ref entity.Get<RollbackComponent>();
-            ref var pieceComponent = ref entity.Get<PieceComponent>();
+            this.myEngine = myEngine;
+        }
 
-            if (findPair.find(rollback.pair, entities) != null)
+        public void Run()
+        {
+            foreach (var e in entities)
             {
-                ref var position = ref entity.Get<PositionComponent>().vec;
+                ref var entity = ref entities.GetEntity(e);
+                ref var rollback = ref entity.Get<RollbackComponent>();
 
-                pieceComponent.piece.dragOffset = position - rollback.backPosition;
+                var pair = findPair.find(rollback.pair, entities);
+
+                if (pair == null) continue;
+
+                ref var pairPosition = ref ((EcsEntity) pair).Get<PositionComponent>().position;
+                rollback.backPosition = pairPosition;
+                
+                set.Add(entity);
+            }
+            
+            foreach (var entity in set)
+            {
+                ref var position = ref entity.Get<PositionComponent>().position;
+                ref var rollbackPosition = ref entity.Get<RollbackComponent>().backPosition;
+                ref var pieceComponent = ref entity.Get<PieceComponent>();
+
+                pieceComponent.piece.dragOffset = new Vector2(position.X - rollbackPosition.X,
+                    position.Y - rollbackPosition.Y);
+                
                 pieceComponent.piece.isBlocked = true;
+                
+                position.X = rollbackPosition.X;
+                position.Y = rollbackPosition.Y;
 
-                position.Set(rollback.backPosition.x, rollback.backPosition.y);
                 entity.Get<MoveComponent>();
 
-                myEngine.valuesBoard[(int) position.x, (int) position.y] = pieceComponent.value;
+                myEngine.valuesBoard[position.X, position.Y] = entity;
             }
-
-            entity.Del<RollbackComponent>();
+            
+            foreach (var e in entities)
+            {
+                ref var entity = ref entities.GetEntity(e);
+                entity.Del<RollbackComponent>();
+            }
+            
+            set.Clear();
         }
     }
 }

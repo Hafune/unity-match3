@@ -1,146 +1,123 @@
 ﻿using Leopotam.Ecs;
-using UnityEngine;
 using System.Collections.Generic;
+using System.Drawing;
+using Scripts;
+using Source.Components;
 
-internal sealed class MatchSystem : IEcsRunSystem
+namespace Source.Systems
 {
-    private readonly bool[,] patternA =
+    internal sealed class MatchSystem : IEcsRunSystem
     {
-        {true, true},
-        {true, true}
-    };
-
-    private readonly bool[,] patternB =
-    {
-        {true, true, true},
-    };
-
-    private readonly bool[,] patternC =
-    {
-        {true},
-        {true},
-        {true},
-    };
-
-    private readonly List<bool[,]> patterns;
-
-    private readonly EcsFilter<
-        MatchComponent,
-        PositionComponent,
-        PieceComponent
-    >.Exclude<AwaitPairComponent> entities = null!;
-
-    private readonly EcsFilter<PositionComponent>.Exclude<FallPositionComponent> freeEntities =
-        null!;
-
-    private readonly MyEngine myEngine;
-
-    public MatchSystem(MyEngine myEngine)
-    {
-        this.myEngine = myEngine;
-
-        patterns = new List<bool[,]>
+        private readonly bool[,] patternA =
         {
-            patternA,
-            patternB,
-            patternC
+            {true, true},
+            {true, true}
         };
-    }
 
-    public void Run()
-    {
-        if (entities.GetEntitiesCount() < 2) return;
-
-        foreach (var e in entities)
+        private readonly bool[,] patternB =
         {
-            ref var entity = ref entities.GetEntity(e);
+            {true, true, true},
+        };
 
-            ref var position = ref entity.Get<PositionComponent>().vec;
-            ref var piece = ref entity.Get<PieceComponent>();
-
-            entity.Del<MatchComponent>();
-
-            checkPatterns(position, piece.value);
-        }
-    }
-
-    private void checkPatterns(Vector2 position, int key)
-    {
-        var set = new HashSet<string>();
-        var total = new List<int>();
-
-        foreach (var pattern in patterns)
+        private readonly bool[,] patternC =
         {
-            checkPatternAllState(pattern, position, key, set, total);
-        }
+            {true},
+            {true},
+            {true},
+        };
 
-        for (var i = 0; i < total.Count; i += 2)
+        private readonly List<bool[,]> patterns;
+
+        private readonly EcsFilter<
+            MatchComponent,
+            PositionComponent,
+            PieceComponent
+        >.Exclude<AwaitPairComponent> entities = null!;
+
+        private readonly MyEngine myEngine;
+
+        public MatchSystem(MyEngine myEngine)
         {
-            var pos = new Vector2(total[i], total[i + 1]);
+            this.myEngine = myEngine;
 
-            foreach (var o in freeEntities)
+            patterns = new List<bool[,]>
             {
-                var free = freeEntities.GetEntity(o);
+                patternA,
+                patternB,
+                patternC
+            };
+        }
 
-                if (free.Get<PositionComponent>().vec != pos) continue;
+        public void Run()
+        {
+            if (entities.GetEntitiesCount() < 2) return;
 
-                free.Get<DestroyComponent>();
+            foreach (var e in entities)
+            {
+                ref var entity = ref entities.GetEntity(e);
 
-                myEngine.valuesBoard[(int) position.x, (int) position.y] = null;
+                ref var vec = ref entity.Get<PositionComponent>().position;
+                ref var piece = ref entity.Get<PieceComponent>();
+
+                entity.Del<MatchComponent>();
+
+                checkPatterns(vec, piece.value);
             }
         }
-    }
 
-    private void checkPatternAllState(bool[,] pattern, Vector2 position, int key, ISet<string> set,
-        ICollection<int> total)
-    {
-        for (var x = 0; x < pattern.GetLength(1); x++)
+        private void checkPatterns(Point position, int value)
         {
-            for (var y = 0; y < pattern.GetLength(0); y++)
+            foreach (var pattern in patterns)
             {
-                if (!pattern[y, x]) continue;
+                checkPatternAllState(pattern, position, value);
+            }
+        }
 
-                var vec = new Vector2(-x + position.x, -y + position.y);
-
-                var list = checkPattern(pattern, vec, key);
-
-                if (list == null) continue;
-
-                for (var i = 0; i < list.Count; i += 2)
+        private void checkPatternAllState(bool[,] pattern, Point position, int value)
+        {
+            for (var x = 0; x < pattern.GetLength(1); x++)
+            {
+                for (var y = 0; y < pattern.GetLength(0); y++)
                 {
-                    var str = $"{list[i]}:{list[i + 1]}";
-                    if (!set.Add(str)) continue;
+                    if (!pattern[y, x]) continue;
 
-                    total.Add(list[i]);
-                    total.Add(list[i + 1]);
+                    var vec = new Point(-x + position.X, -y + position.Y);
+
+                    checkPattern(pattern, vec, value);
                 }
             }
         }
-    }
 
-    private List<int>? checkPattern(bool[,] pattern, Vector2 position, int key)
-    {
-        var list = new List<int>();
-
-        for (var x = 0; x < pattern.GetLength(1); x++)
+        private void checkPattern(bool[,] pattern, Point position, int value)
         {
-            for (var y = 0; y < pattern.GetLength(0); y++)
-            {
-                if (!pattern[y, x]) continue;
-                var vec = new Vector2(x + position.x, y + position.y);
+            var list = new HashSet<EcsEntity>();
 
-                var board = myEngine.valuesBoard;
-                if (vec.x < 0 ||
-                    vec.y < 0 ||
-                    vec.x >= board.GetLength(0) ||
-                    vec.y >= board.GetLength(1)) return null;
-                var val = board[(int) vec.x, (int) vec.y];
-                if (val != key) return null;
-                list.Add((int) vec.x);
-                list.Add((int) vec.y);
+            for (var x = 0; x < pattern.GetLength(1); x++)
+            {
+                for (var y = 0; y < pattern.GetLength(0); y++)
+                {
+                    if (!pattern[y, x]) continue;
+                    var vec = new Point(x + position.X, y + position.Y);
+
+                    var board = myEngine.valuesBoard;
+                    if (vec.X < 0 ||
+                        vec.Y < 0 ||
+                        vec.X >= board.GetLength(0) ||
+                        vec.Y >= board.GetLength(1)) return;
+
+                    var entity = board[vec.X, vec.Y];
+
+                    if (entity == null) return;
+                    if (((EcsEntity) entity).Get<PieceComponent>().value != value) return;
+
+                    list.Add((EcsEntity) entity);
+                }
+            }
+
+            foreach (var entity in list)
+            {
+                entity.Get<DestroyComponent>();
             }
         }
-
-        return list;
     }
 }

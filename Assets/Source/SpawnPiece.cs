@@ -1,41 +1,47 @@
 ﻿using System;
 using Leopotam.Ecs;
+using Scripts;
+using Source.Components;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-public class SpawnPiece : Object
+namespace Systems
 {
-    public SpawnPiece(MyEngine myEngine, float x, float y)
+    public class SpawnPiece : Object
     {
-        var world = myEngine.world;
-        var sprites = myEngine.sprites;
-        var nodePiece = myEngine.nodePiece;
-        var gameBoard = myEngine.gameBoard;
+        public SpawnPiece(MyEngine myEngine, int x, int y)
+        {
+            var world = myEngine.world;
+            var sprites = myEngine.sprites;
+            var nodePiece = myEngine.nodePiece;
+            var gameBoard = myEngine.gameBoard;
 
-        var canvas = gameBoard.parent.GetComponent<Canvas>();
-        var entity = world.NewEntity();
+            var canvas = gameBoard.parent.GetComponent<Canvas>();
+            var entity = world.NewEntity();
 
-        entity.Get<MoveComponent>();
-        ref var position = ref entity.Get<PositionComponent>();
-        ref var piece = ref entity.Get<PieceComponent>();
+            entity.Get<MoveComponent>();
 
-        var index = Convert.ToInt16(MyEngine.random.NextDouble() * (sprites.Length - 1));
-        var obj = Instantiate(nodePiece, gameBoard);
+            ref var position = ref entity.Get<PositionComponent>();
+            ref var piece = ref entity.Get<PieceComponent>();
 
-        piece.value = index;
-        piece.piece = obj.GetComponent<Piece>();
-        piece.piece.Initialize(myEngine);
-        piece.piece.img.sprite = sprites[index];
-        piece.piece.canvas = canvas;
+            var index = Convert.ToInt16(MyEngine.random.NextDouble() * (sprites.Length - 1));
+            var obj = Instantiate(nodePiece, gameBoard);
 
-        position.vec.x = x;
-        position.vec.y = y;
-        myEngine.valuesBoard[(int) x, (int) y] = piece.value;
+            piece.value = index;
+            piece.piece = obj.GetComponent<Piece>();
+            piece.piece.Initialize(myEngine);
+            piece.piece.img.sprite = sprites[index];
+            piece.piece.canvas = canvas;
 
-        piece.piece.rect.anchoredPosition = position.vec;
+            position.position.X = x;
+            position.position.Y = y;
+            myEngine.valuesBoard[x, y] = entity;
 
-        piece.piece.isBlocked = true;
-        piece.piece.dragOffset = new Vector2((float) (MyEngine.random.NextDouble() * 4f - 2),
-            (float) (MyEngine.random.NextDouble() * 4f - 2));
+            var rect = piece.piece.rect.rect;
+            piece.piece.rect.anchoredPosition = new Vector2(-rect.width,-rect.height);
+
+            piece.piece.isBlocked = true;
+            piece.piece.dragOffset = new Vector2(0f, 14f);
+        }
     }
 }

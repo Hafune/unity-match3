@@ -1,3 +1,6 @@
-﻿    public struct MatchComponent
+﻿namespace Source.Components
+{
+    public struct MatchComponent
     {
     }
+}

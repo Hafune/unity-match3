@@ -1,56 +1,62 @@
 ﻿using System;
 using Leopotam.Ecs;
+using Scripts;
+using Source.Components;
 using UnityEngine;
 
-internal sealed class MovePieceSystem : IEcsRunSystem
+namespace Source.Systems
 {
-    private readonly Rect boardRect;
-    private readonly MyEngine myEngine;
-
-    private readonly EcsFilter<MoveComponent, PositionComponent, PieceComponent> entities = null!;
-
-    public MovePieceSystem(MyEngine myEngine)
+    internal sealed class MovePieceSystem : IEcsRunSystem
     {
-        this.myEngine = myEngine;
-        boardRect = myEngine.gameBoard.rect;
-    }
+        private readonly Rect boardRect;
+        private readonly MyEngine myEngine;
 
-    public void Run()
-    {
-        var rect = boardRect;
-        var width = myEngine.boardInitializer.width;
-        var height = myEngine.boardInitializer.height;
+        private readonly EcsFilter<MoveComponent, PositionComponent, PieceComponent> entities = null!;
 
-        var halfWidth = rect.width / width / 2;
-        var halfHeight = rect.height / height / 2;
-
-        foreach (var i in entities)
+        public MovePieceSystem(MyEngine myEngine)
         {
-            ref var entity = ref entities.GetEntity(i);
-            ref var position = ref entity.Get<PositionComponent>().vec;
-            ref var piece = ref entity.Get<PieceComponent>().piece;
+            this.myEngine = myEngine;
+            boardRect = myEngine.gameBoard.rect;
+        }
 
-            ref var drag = ref piece.dragOffset;
+        public void Run()
+        {
+            var rect = boardRect;
+            var width = myEngine.boardInitializer.width;
+            var height = myEngine.boardInitializer.height;
 
-            if (!piece.isDragged)
+            var halfWidth = rect.width / width / 2;
+            var halfHeight = rect.height / height / 2;
+
+            foreach (var i in entities)
             {
-                drag -= drag * Time.deltaTime * 20;
-                if (Math.Abs(drag.x) < .01) drag.x = 0f;
-                if (Math.Abs(drag.y) < .01) drag.y = 0f;
+                ref var entity = ref entities.GetEntity(i);
+                ref var position = ref entity.Get<PositionComponent>().position;
+                ref var piece = ref entity.Get<PieceComponent>().piece;
 
-                if (drag.magnitude == 0)
+                ref var drag = ref piece.dragOffset;
+
+                if (!piece.isDragged || piece.isBlocked)
                 {
-                    entity.Get<MatchComponent>();
-                    entity.Del<MoveComponent>();
-                    piece.isBlocked = false;
+                    if (drag.magnitude > 0) drag -= drag * Time.deltaTime * 20;
+
+                    if (Math.Abs(drag.x) < .01) drag.x = 0f;
+                    if (Math.Abs(drag.y) < .01) drag.y = 0f;
+
+                    if (drag.magnitude == 0)
+                    {
+                        entity.Get<MatchComponent>();
+                        entity.Del<MoveComponent>();
+                        piece.isBlocked = false;
+                    }
                 }
+
+                var vec = new Vector2(position.X * rect.width / width + halfWidth,
+                    position.Y * rect.height / height + halfHeight);
+
+                piece.rect.anchoredPosition =
+                    vec + piece.dragOffset * myEngine.pixelPerMeter;
             }
-
-            var vec = new Vector2(position.x * rect.width / width + halfWidth,
-                position.y * rect.height / height + halfHeight);
-
-            piece.rect.anchoredPosition =
-                vec + piece.dragOffset * myEngine.pixelPerMeter;
         }
     }
 }

@@ -1,3 +1,6 @@
-﻿public struct DestroyComponent
+﻿namespace Source.Components
 {
+    public struct DestroyComponent
+    {
+    }
 }

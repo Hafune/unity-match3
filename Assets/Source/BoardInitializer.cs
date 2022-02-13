@@ -1,5 +1,9 @@
-﻿using Object = UnityEngine.Object;
+﻿using Leopotam.Ecs;
+using Scripts;
+using Object = UnityEngine.Object;
 
+namespace Systems
+{
     public class BoardInitializer : Object
     {
         public readonly int width = 9;
@@ -7,7 +11,7 @@
 
         public BoardInitializer(MyEngine myEngine)
         {
-            myEngine.valuesBoard = new int?[width, height];
+            myEngine.valuesBoard = new EcsEntity?[width, height];
 
             for (var x = 0; x < width; x++)
             {
@@ -18,3 +22,4 @@
             }
         }
     }
+}

@@ -1,26 +1,41 @@
 ﻿using Leopotam.Ecs;
+using Source.Components;
+using Systems;
 
-internal sealed class AwaitPairSystem : IEcsRunSystem
+namespace Source.Systems
 {
-    private readonly EcsFilter<AwaitPairComponent, MatchComponent> entities = null!;
-
-    private readonly FindPair findPair = new FindPair();
-
-    public void Run()
+    internal sealed class AwaitPairSystem : IEcsRunSystem
     {
-        if (entities.GetEntitiesCount() < 2) return;
+        private readonly EcsFilter<AwaitPairComponent, MatchComponent> entities = null!;
+        private readonly EcsFilter<AwaitPairComponent, PieceComponent> awaits = null!;
 
-        foreach (var e in entities)
+        private readonly FindPair findPair = new FindPair();
+
+        public void Run()
         {
-            ref var entity = ref entities.GetEntity(e);
-            ref var pairComponent = ref entity.Get<AwaitPairComponent>();
+            foreach (var e in entities)
+            {
+                ref var entity = ref entities.GetEntity(e);
+                ref var awaitComponent = ref entity.Get<AwaitPairComponent>();
 
-            if (findPair.find(pairComponent.pair, entities) == null) continue;
+                var pair = findPair.find(awaitComponent.pair, entities);
+                if (pair == null) continue;
 
-            entity.Get<RollbackComponent>().backPosition = pairComponent.startPosition;
-            entity.Get<RollbackComponent>().pair = pairComponent.pair;
+                entity.Get<RollbackComponent>().pair = awaitComponent.pair;
 
-            entity.Del<AwaitPairComponent>();
+                entity.Del<AwaitPairComponent>();
+            }
+
+            foreach (var e in awaits)
+            {
+                ref var entity = ref awaits.GetEntity(e);
+                ref var awaitComponent = ref entity.Get<AwaitPairComponent>();
+
+                if (findPair.find(awaitComponent.pair, awaits) != null) continue;
+
+                entity.Get<PieceComponent>().piece.isBlocked = false;
+                entity.Del<AwaitPairComponent>();
+            }
         }
     }
 }

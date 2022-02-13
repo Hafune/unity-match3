@@ -2,56 +2,60 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Piece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
+namespace Scripts
 {
-    public Canvas canvas = null!;
-    [HideInInspector] public RectTransform rect = null!;
-    [HideInInspector] public Image img = null!;
-
-    [HideInInspector] public Vector2 dragOffset;
-    public CanvasRenderer canvasRenderer = null!;
-
-    [HideInInspector] public bool isDragged;
-    [HideInInspector] public bool justPointerUp;
-    [HideInInspector] public bool isBlocked;
-
-    [Range(0.1f, 10f)] public float fallSpeed = 3f;
-    [Range(0f, 10f)] public float horizontalSpread = 2f;
-
-    private MyEngine ecs = null!;
-
-    public void Initialize(MyEngine myEngine)
+    public class Piece : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
     {
-        img = GetComponent<Image>();
-        rect = GetComponent<RectTransform>();
+        public Canvas canvas = null!;
+        [HideInInspector] public RectTransform rect = null!;
+        [HideInInspector] public Image img = null!;
 
-        ecs = myEngine;
-    }
+        // [HideInInspector] public Vector2 lastDragOffset;
+        [HideInInspector] public Vector2 dragOffset;
+        public CanvasRenderer canvasRenderer = null!;
 
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        canvasRenderer.transform.SetAsLastSibling();
-    }
+        [HideInInspector] public bool isDragged;
+        [HideInInspector] public bool justPointerUp;
+        [HideInInspector] public bool isBlocked;
 
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        if (isBlocked) return;
+        [Range(0.1f, 10f)] public float fallSpeed = 3f;
+        [Range(0f, 10f)] public float horizontalSpread = 2f;
 
-        isDragged = false;
-        justPointerUp = true;
-    }
+        private MyEngine ecs = null!;
 
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (isBlocked) return;
+        public void Initialize(MyEngine myEngine)
+        {
+            img = GetComponent<Image>();
+            rect = GetComponent<RectTransform>();
 
-        isDragged = true;
-        dragOffset += eventData.delta / canvas.scaleFactor / ecs.pixelPerMeter;
-    }
+            ecs = myEngine;
+        }
 
-    public void DestroyScriptInstance()
-    {
-        Destroy(this);
-        Destroy(img);
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            canvasRenderer.transform.SetAsLastSibling();
+        }
+
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            isDragged = false;
+            if (isBlocked) return;
+
+            justPointerUp = true;
+        }
+
+        public void OnDrag(PointerEventData eventData)
+        {
+            if (isBlocked) return;
+
+            isDragged = true;
+            dragOffset = (eventData.position - eventData.pressPosition) / canvas.scaleFactor / ecs.pixelPerMeter;
+        }
+
+        public void DestroyScriptInstance()
+        {
+            Destroy(this);
+            Destroy(img);
+        }
     }
 }

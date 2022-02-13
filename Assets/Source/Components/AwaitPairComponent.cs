@@ -1,8 +1,10 @@
-﻿using Leopotam.Ecs;
-using UnityEngine;
+﻿using System.Drawing;
+using Leopotam.Ecs;
 
-public struct AwaitPairComponent
+namespace Source.Components
 {
-    public Vector2 startPosition;
-    public EcsEntity pair;
+    public struct AwaitPairComponent
+    {
+        public EcsEntity pair;
+    }
 }

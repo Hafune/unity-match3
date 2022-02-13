@@ -1,4 +1,9 @@
-﻿public struct FallPieceComponent
+﻿using Scripts;
+
+namespace Source.Components
 {
-    public Piece piece;
+    public struct FallPieceComponent
+    {
+        public Piece piece;
+    }
 }

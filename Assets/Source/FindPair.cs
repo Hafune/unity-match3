@@ -1,15 +1,18 @@
 ﻿using Leopotam.Ecs;
 
-public class FindPair
+namespace Systems
 {
-    public EcsEntity? find(EcsEntity entity, EcsFilter entities)
+    public class FindPair
     {
-        for (var i = 0; i < entities.GetEntitiesCount(); i++)
+        public EcsEntity? find(EcsEntity entity, EcsFilter entities)
         {
-            if (entity != entities.GetEntity(i)) continue;
-            return entity;
-        }
+            for (var i = 0; i < entities.GetEntitiesCount(); i++)
+            {
+                if (entity != entities.GetEntity(i)) continue;
+                return entity;
+            }
 
-        return null;
+            return null;
+        }
     }
 }

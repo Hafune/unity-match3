@@ -1,5 +1,10 @@
-﻿public struct PieceComponent
+﻿using Scripts;
+
+namespace Source.Components
 {
-    public Piece piece;
-    public int value;
+    public struct PieceComponent
+    {
+        public Piece piece;
+        public int value;
+    }
 }

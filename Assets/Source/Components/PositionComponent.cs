@@ -1,6 +1,10 @@
-﻿using UnityEngine;
+﻿using System.Drawing;
 
-public struct PositionComponent
+namespace Source.Components
 {
-    public Vector2 vec;
+    public struct PositionComponent
+    {
+        public Point position;
+        public Point nextPositionOffset;
+    }
 }

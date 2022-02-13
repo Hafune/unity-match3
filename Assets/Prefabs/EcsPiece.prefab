@@ -96,5 +96,5 @@ MonoBehaviour:
   isDragged: 0
   justPointerUp: 0
   isBlocked: 0
-  fallSpeed: 5.09
+  fallSpeed: 5.01
   horizontalSpread: 2
