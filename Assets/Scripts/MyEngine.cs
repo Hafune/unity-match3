@@ -70,11 +70,7 @@ namespace Scripts
 
             systems.Run();
 
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                // Quit the application
-                Application.Quit();
-            }
+            if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
         }
 
         private void OnDestroy()

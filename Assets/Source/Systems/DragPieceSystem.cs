@@ -1,5 +1,7 @@
-﻿using Leopotam.Ecs;
+﻿using System;
+using Leopotam.Ecs;
 using Source.Components;
+using UnityEngine;
 
 namespace Source.Systems
 {
@@ -13,25 +15,23 @@ namespace Source.Systems
             {
                 ref var entity = ref justDroppedEntities.GetEntity(i);
                 ref var piece = ref entity.Get<PieceComponent>().piece;
-                
-                // ref var lastDrag = ref piece.lastDragOffset;
-                // ref var drag = ref piece.dragOffset;
-                
-                // var nDir = drag.normalized;
-                // var aDir = new Vector2(Math.Abs(drag.x), Math.Abs(drag.y));
 
-                // if (piece.isDragged && drag.magnitude >= 1f)
-                // {
-                //     entity.Get<MoveComponent>();
-                //     piece.dragOffset = aDir.x > aDir.y
-                //         ? new Vector2(nDir.x > 0 ? 1f : -1f, 0f)
-                //         : new Vector2(0f, nDir.y > 0 ? 1f : -1f);
-                // } 
-                
-                if (piece.isDragged) entity.Get<MoveComponent>();
+                if (piece.isDragged)
+                {
+                    entity.Get<MoveComponent>();
+                    var rVec = piece.realDragOffset;
+
+                    var normVec = rVec.magnitude > 1 ? rVec.normalized : rVec;
+
+                    if (Math.Abs(normVec.x) > Math.Abs(normVec.y)) normVec.y /= 4f;
+                    else normVec.x /= 4f;
+
+                    piece.dragOffset = Vector2.Lerp(piece.dragOffset, normVec, Time.deltaTime * 30);
+                }
 
                 if (!piece.justPointerUp) continue;
-                
+
+                piece.isDragged = false;
                 piece.isBlocked = true;
                 piece.justPointerUp = false;
                 entity.Get<DropPieceEvent>();

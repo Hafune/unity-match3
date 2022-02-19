@@ -53,17 +53,18 @@ namespace Source.Systems
             {
                 ref var entity = ref entities.GetEntity(i);
                 ref var position = ref entity.Get<PositionComponent>().position;
-                ref var pieceComponent = ref entity.Get<PieceComponent>();
+                ref var piece = ref entity.Get<PieceComponent>().piece;
 
                 if (position != targetPosition) continue;
-                if (pieceComponent.piece.isBlocked) continue;
+                if (piece.isBlocked) continue;
+                if (piece.isDragged) continue;
 
-                pieceComponent.piece.canvasRenderer.transform.SetAsLastSibling();
+                piece.canvasRenderer.transform.SetAsLastSibling();
 
                 entity.Get<AwaitPairComponent>().pair = pair;
 
-                pieceComponent.piece.dragOffset = new Vector2(position.X - from.X, position.Y - from.Y);
-                pieceComponent.piece.isBlocked = true;
+                piece.dragOffset = new Vector2(position.X - from.X, position.Y - from.Y);
+                piece.isBlocked = true;
 
                 position.X = from.X;
                 position.Y = from.Y;

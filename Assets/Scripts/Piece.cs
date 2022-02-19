@@ -12,6 +12,7 @@ namespace Scripts
 
         // [HideInInspector] public Vector2 lastDragOffset;
         [HideInInspector] public Vector2 dragOffset;
+        [HideInInspector] public Vector2 realDragOffset;
         public CanvasRenderer canvasRenderer = null!;
 
         [HideInInspector] public bool isDragged;
@@ -49,7 +50,7 @@ namespace Scripts
             if (isBlocked) return;
 
             isDragged = true;
-            dragOffset = (eventData.position - eventData.pressPosition) / canvas.scaleFactor / ecs.pixelPerMeter;
+            realDragOffset = (eventData.position - eventData.pressPosition) / canvas.scaleFactor / ecs.pixelPerMeter;
         }
 
         public void DestroyScriptInstance()
