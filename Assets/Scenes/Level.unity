@@ -326,6 +326,8 @@ MonoBehaviour:
   - {fileID: -488248382649040768, guid: 34f6321b206afab459fb7c8d37989456, type: 3}
   - {fileID: -7105913188517789750, guid: 34f6321b206afab459fb7c8d37989456, type: 3}
   - {fileID: 5528609633622603068, guid: 2c97df9695607b04c92ec362851a0890, type: 3}
+  width: 6
+  height: 12
   score: {fileID: 1482933803}
   gameBoard: {fileID: 741463912}
   fallBoard: {fileID: 1647519061}
@@ -616,9 +618,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 288, y: 447.99997}
   m_SizeDelta: {x: 576, y: 896}
-  m_Pivot: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &741463913
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -844,9 +846,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 288, y: 447.99997}
   m_SizeDelta: {x: 576, y: 896}
-  m_Pivot: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1647519062
 CanvasRenderer:
   m_ObjectHideFlags: 0
