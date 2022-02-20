@@ -34,6 +34,7 @@ namespace Source.Systems
                 piece.isDragged = false;
                 piece.isBlocked = true;
                 piece.justPointerUp = false;
+                entity.Get<MoveComponent>();
                 entity.Get<DropPieceEvent>();
             }
         }

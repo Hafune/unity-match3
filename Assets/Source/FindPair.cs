@@ -4,7 +4,7 @@ namespace Systems
 {
     public class FindPair
     {
-        public EcsEntity? find(EcsEntity entity, EcsFilter entities)
+        public EcsEntity? find(ref EcsEntity entity, EcsFilter entities)
         {
             for (var i = 0; i < entities.GetEntitiesCount(); i++)
             {

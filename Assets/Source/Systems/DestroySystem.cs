@@ -10,12 +10,12 @@ namespace Source.Systems
 {
     internal sealed class DestroySystem : IEcsRunSystem
     {
-        private readonly EcsFilter<PositionComponent, PieceComponent>.Exclude<DestroyComponent> alivePieces = null!;
         private readonly EcsFilter<DestroyComponent, PositionComponent> entities = null!;
 
         private readonly EcsWorld world = null!;
         private readonly MyEngine myEngine;
-        private readonly HashSet<EcsEntity> slideEntities = new HashSet<EcsEntity>();
+
+        private readonly ChangePosition changePosition = new ChangePosition();
 
         public DestroySystem(MyEngine myEngine)
         {
@@ -25,6 +25,14 @@ namespace Source.Systems
         public void Run()
         {
             var hasEmptySlots = false;
+            var board = myEngine.board;
+            foreach (var i in entities)
+            {
+                ref var entity = ref entities.GetEntity(i);
+                ref var position = ref entity.Get<PositionComponent>().position;
+                board[position.X, position.Y] = null;
+            }
+
             foreach (var i in entities)
             {
                 hasEmptySlots = true;
@@ -45,47 +53,23 @@ namespace Source.Systems
                 piece.transform.SetParent(myEngine.fallBoard);
                 piece.img.raycastTarget = false;
 
-                foreach (var ecsEntity in sideUppers(position)) slideEntities.Add(ecsEntity);
+                moveAround(position);
 
                 myEngine.score.text = (int.Parse(myEngine.score.text) + 1).ToString();
 
-                myEngine.valuesBoard[position.X, position.Y] = null;
                 entity.Destroy();
             }
 
-            foreach (var entity in slideEntities)
-            {
-                ref var position = ref entity.Get<PositionComponent>().position;
-                ref var offset = ref entity.Get<PositionComponent>().nextPositionOffset;
-
-                myEngine.valuesBoard[position.X, position.Y] = null;
-                position.X += offset.X;
-                position.Y += offset.Y;
-                offset.X = 0;
-                offset.Y = 0;
-            }
-
-            foreach (var entity in slideEntities)
-            {
-                ref var position = ref entity.Get<PositionComponent>().position;
-                entity.Get<PieceComponent>().piece.isBlocked = true;
-
-                entity.Get<MoveComponent>();
-                myEngine.valuesBoard[position.X, position.Y] = entity;
-            }
-
-            slideEntities.Clear();
-
             if (!hasEmptySlots) return;
 
-            var width = myEngine.valuesBoard.GetLength(0);
-            var height = myEngine.valuesBoard.GetLength(1);
+            var width = board.GetLength(0);
+            var height = board.GetLength(1);
 
             for (var x = 0; x < width; x++)
             {
                 for (var y = 0; y < height; y++)
                 {
-                    if (myEngine.valuesBoard[x, y] == null)
+                    if (board[x, y] == null)
                     {
                         new SpawnPiece(myEngine: myEngine, x: x, y: y);
                     }
@@ -93,26 +77,37 @@ namespace Source.Systems
             }
         }
 
-        private HashSet<EcsEntity> sideUppers(Point point)
+        private void moveAround(Point freePoint)
         {
-            var set = new HashSet<EcsEntity>();
-            foreach (var i in alivePieces)
-            {
-                ref var entity = ref alivePieces.GetEntity(i);
-                ref var position = ref entity.Get<PositionComponent>().position;
-                ref var pieceComponent = ref entity.Get<PieceComponent>();
+            if (movePiece(freePoint.X + 1, freePoint.Y)) moveAround(new Point(freePoint.X + 1, freePoint.Y));
 
-                if (!(position.X == point.X && position.Y > point.Y)) continue;
+            if (movePiece(freePoint.X - 1, freePoint.Y)) moveAround(new Point(freePoint.X - 1, freePoint.Y));
 
-                ref var offset = ref entity.Get<PositionComponent>().nextPositionOffset;
+            if (movePiece(freePoint.X, freePoint.Y + 1)) moveAround(new Point(freePoint.X, freePoint.Y + 1));
 
-                offset.Y -= 1;
+            if (movePiece(freePoint.X, freePoint.Y - 1)) moveAround(new Point(freePoint.X, freePoint.Y - 1));
+        }
 
-                pieceComponent.piece.dragOffset.y += 1f;
-                set.Add(entity);
-            }
+        private bool movePiece(int x, int y)
+        {
+            var width = myEngine.board.GetLength(0);
+            var height = myEngine.board.GetLength(1);
+            if (x < 0 || x >= width || y < 0 || y >= height) return false;
 
-            return set;
+            ref var e = ref myEngine.board[x, y];
+            if (e == null) return false;
+            var entity = (EcsEntity) e;
+
+            if (y - 1 < 0 || myEngine.board[x, y - 1] != null) return false;
+
+            myEngine.board[x, y] = null;
+            myEngine.board[x, y - 1] = entity;
+            
+            changePosition.Change(ref entity, new Point(x, y - 1));
+            
+            movePiece(x, y - 1);
+
+            return true;
         }
     }
 }

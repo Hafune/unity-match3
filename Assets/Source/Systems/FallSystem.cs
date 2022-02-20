@@ -31,8 +31,8 @@ namespace Source.Systems
 
                 position += val * Time.deltaTime * piece.fallSpeed;
 
-                var vec = new Vector2(position.x * myEngine.pixelPerMeter,
-                    position.y * myEngine.pixelPerMeter);
+                var vec = new Vector2(position.x * myEngine.pixelPerMeterX,
+                    position.y * myEngine.pixelPerMeterY);
 
                 piece.rect.anchoredPosition = vec;
 

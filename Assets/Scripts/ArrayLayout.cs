@@ -1,13 +1,22 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public class ArrayLayout  {
+public class ArrayLayout
+{
+    public int width;
+    public int height;
 
-	[System.Serializable]
-	public struct rowData{
-		public bool[] row;
-	}
+    [System.Serializable]
+    public struct rowData
+    {
+        public bool[] row;
+    }
 
-    public Grid grid = null!;
-    public rowData[] rows = new rowData[14]; //Grid of 7x7
+    public rowData[] rows = new rowData[4]; //Grid of 7x7
+
+    public ArrayLayout(int width, int height)
+    {
+        this.width = width;
+        this.height = height;
+    }
 }

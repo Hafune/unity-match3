@@ -1,17 +1,23 @@
-﻿using Leopotam.Ecs;
+﻿using System.Drawing;
+using Leopotam.Ecs;
 using Scripts;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Systems
 {
     public class BoardInitializer : Object
     {
-        public readonly int width = 9;
-        public readonly int height = 14;
-
         public BoardInitializer(MyEngine myEngine)
         {
-            myEngine.valuesBoard = new EcsEntity?[width, height];
+            var width = myEngine.width;
+            var height = myEngine.height;
+
+            myEngine.board = new EcsEntity?[width, height];
+            
+            var size = new Vector2(width * 64, height * 64);
+            myEngine.gameBoard.GetComponent<RectTransform>().sizeDelta = size;
+            myEngine.fallBoard.GetComponent<RectTransform>().sizeDelta = size;
 
             for (var x = 0; x < width; x++)
             {

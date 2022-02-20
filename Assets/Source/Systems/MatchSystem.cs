@@ -99,7 +99,7 @@ namespace Source.Systems
                     if (!pattern[y, x]) continue;
                     var vec = new Point(x + position.X, y + position.Y);
 
-                    var board = myEngine.valuesBoard;
+                    var board = myEngine.board;
                     if (vec.X < 0 ||
                         vec.Y < 0 ||
                         vec.X >= board.GetLength(0) ||

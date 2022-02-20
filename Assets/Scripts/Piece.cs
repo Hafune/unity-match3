@@ -50,7 +50,9 @@ namespace Scripts
             if (isBlocked) return;
 
             isDragged = true;
-            realDragOffset = (eventData.position - eventData.pressPosition) / canvas.scaleFactor / ecs.pixelPerMeter;
+            realDragOffset = (eventData.position - eventData.pressPosition) / canvas.scaleFactor;
+            realDragOffset.x /= ecs.pixelPerMeterX;
+            realDragOffset.y /= ecs.pixelPerMeterY;
         }
 
         public void DestroyScriptInstance()

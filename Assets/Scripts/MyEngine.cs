@@ -16,14 +16,18 @@ namespace Scripts
         public GameObject nodePiece = null!;
         public Sprite[] sprites = null!;
 
+        public int width;
+        public int height;
+        
         public Text score = null!;
         public RectTransform gameBoard = null!;
         public RectTransform fallBoard = null!;
         [HideInInspector] public BoardInitializer boardInitializer = null!;
 
-        public EcsEntity?[,] valuesBoard = null!;
+        public EcsEntity?[,] board = null!;
 
-        public float pixelPerMeter { get; private set; }
+        public float pixelPerMeterX { get; private set; }
+        public float pixelPerMeterY { get; private set; }
         public static readonly Random random = new Random();
 
         private void Start()
@@ -66,7 +70,8 @@ namespace Scripts
 
         private void Update()
         {
-            pixelPerMeter = gameBoard.rect.width / boardInitializer.width;
+            pixelPerMeterX = gameBoard.rect.width / width;
+            pixelPerMeterY = gameBoard.rect.height / height;
 
             systems.Run();
 

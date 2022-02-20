@@ -4,6 +4,7 @@ using UnityEngine;
 using Leopotam.Ecs;
 using Scripts;
 using Source.Components;
+using Systems;
 
 namespace Source.Systems
 {
@@ -11,6 +12,7 @@ namespace Source.Systems
     {
         private readonly MyEngine myEngine;
 
+        private readonly ChangePosition changePosition = new ChangePosition();
         private readonly EcsFilter<PositionComponent, PieceComponent, DropPieceEvent> droppedEntities = null!;
         private readonly EcsFilter<PositionComponent, PieceComponent>.Exclude<DropPieceEvent> entities = null!;
 
@@ -25,25 +27,18 @@ namespace Source.Systems
             {
                 ref var entity = ref droppedEntities.GetEntity(i);
                 ref var position = ref entity.Get<PositionComponent>().position;
-                ref var pieceComponent = ref entity.Get<PieceComponent>();
-                ref var drag = ref pieceComponent.piece.dragOffset;
+                ref var piece = ref entity.Get<PieceComponent>().piece;
+                ref var drag = ref piece.dragOffset;
                 var targetPosition = new Point(position.X + (int) Math.Round(drag.x),
                     position.Y + (int) Math.Round(drag.y));
 
-                var pair = switchIfExist(pair: entity, targetPosition: targetPosition, from: position);
-                if (pair == null) continue;
+                var nullablePair = switchIfExist(pair: entity, targetPosition: targetPosition, from: position);
+                if (nullablePair == null) continue;
+                var pair = (EcsEntity) nullablePair;
 
-                entity.Get<AwaitPairComponent>().pair = (EcsEntity) pair;
+                piece.canvasRenderer.transform.SetAsLastSibling();
 
-                pieceComponent.piece.dragOffset =
-                    new Vector2(position.X + drag.x - targetPosition.X,
-                        position.Y + drag.y - targetPosition.Y);
-
-                position.X = targetPosition.X;
-                position.Y = targetPosition.Y;
-                entity.Get<MoveComponent>();
-
-                myEngine.valuesBoard[position.X, position.Y] = entity;
+                swap(entity: ref entity, pair: ref pair, targetPosition);
             }
         }
 
@@ -59,23 +54,19 @@ namespace Source.Systems
                 if (piece.isBlocked) continue;
                 if (piece.isDragged) continue;
 
-                piece.canvasRenderer.transform.SetAsLastSibling();
-
-                entity.Get<AwaitPairComponent>().pair = pair;
-
-                piece.dragOffset = new Vector2(position.X - from.X, position.Y - from.Y);
-                piece.isBlocked = true;
-
-                position.X = from.X;
-                position.Y = from.Y;
-                entity.Get<MoveComponent>();
-
-                myEngine.valuesBoard[position.X, position.Y] = entity;
+                swap(entity: ref entity, pair: ref pair, newPosition: from);
 
                 return entity;
             }
-
             return null;
+        }
+
+        private void swap(ref EcsEntity entity, ref EcsEntity pair, Point newPosition)
+        {
+            entity.Get<AwaitPairComponent>().pair = pair;
+
+            changePosition.Change(ref entity, newPosition);
+            myEngine.board[newPosition.X, newPosition.Y] = entity;
         }
     }
 }

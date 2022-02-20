@@ -8,7 +8,6 @@ namespace Source.Systems
 {
     internal sealed class MovePieceSystem : IEcsRunSystem
     {
-        private readonly Rect boardRect;
         private readonly MyEngine myEngine;
 
         private readonly EcsFilter<MoveComponent, PositionComponent, PieceComponent> entities = null!;
@@ -16,14 +15,13 @@ namespace Source.Systems
         public MovePieceSystem(MyEngine myEngine)
         {
             this.myEngine = myEngine;
-            boardRect = myEngine.gameBoard.rect;
         }
 
         public void Run()
         {
-            var rect = boardRect;
-            var width = myEngine.boardInitializer.width;
-            var height = myEngine.boardInitializer.height;
+            var rect = myEngine.gameBoard.rect;
+            var width = myEngine.width;
+            var height = myEngine.height;
 
             var halfWidth = rect.width / width / 2;
             var halfHeight = rect.height / height / 2;
@@ -38,7 +36,7 @@ namespace Source.Systems
 
                 if (!piece.isDragged || piece.isBlocked)
                 {
-                    if (drag.magnitude > 0) drag -= drag * Time.deltaTime * 20;
+                    if (drag.magnitude > 0) drag -= drag * Time.deltaTime * 2;
 
                     if (Math.Abs(drag.x) < .01) drag.x = 0f;
                     if (Math.Abs(drag.y) < .01) drag.y = 0f;
@@ -54,8 +52,10 @@ namespace Source.Systems
                 var vec = new Vector2(position.X * rect.width / width + halfWidth,
                     position.Y * rect.height / height + halfHeight);
 
-                piece.rect.anchoredPosition =
-                    vec + piece.dragOffset * myEngine.pixelPerMeter;
+                piece.rect.anchoredPosition = vec + new Vector2(
+                    piece.dragOffset.x * myEngine.pixelPerMeterX,
+                    piece.dragOffset.y * myEngine.pixelPerMeterY
+                );
             }
         }
     }

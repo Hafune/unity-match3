@@ -18,7 +18,7 @@ namespace Source.Systems
                 ref var entity = ref entities.GetEntity(e);
                 ref var awaitComponent = ref entity.Get<AwaitPairComponent>();
 
-                var pair = findPair.find(awaitComponent.pair, entities);
+                var pair = findPair.find(ref awaitComponent.pair, entities);
                 if (pair == null) continue;
 
                 entity.Get<RollbackComponent>().pair = awaitComponent.pair;
@@ -31,7 +31,7 @@ namespace Source.Systems
                 ref var entity = ref awaits.GetEntity(e);
                 ref var awaitComponent = ref entity.Get<AwaitPairComponent>();
 
-                if (findPair.find(awaitComponent.pair, awaits) != null) continue;
+                if (findPair.find(ref awaitComponent.pair, awaits) != null) continue;
 
                 entity.Get<PieceComponent>().piece.isBlocked = false;
                 entity.Del<AwaitPairComponent>();

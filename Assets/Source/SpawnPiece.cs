@@ -35,7 +35,7 @@ namespace Systems
 
             position.position.X = x;
             position.position.Y = y;
-            myEngine.valuesBoard[x, y] = entity;
+            myEngine.board[x, y] = entity;
 
             var rect = piece.piece.rect.rect;
             piece.piece.rect.anchoredPosition = new Vector2(-rect.width,-rect.height);
