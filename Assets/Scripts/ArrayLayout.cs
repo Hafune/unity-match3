@@ -1,22 +1,14 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+public class ArrayLayout : MonoBehaviour
+{
+    public List<SelectSprite> list = new List<SelectSprite>();
+}
 
 [System.Serializable]
-public class ArrayLayout
+public class SelectSprite
 {
-    public int width;
-    public int height;
-
-    [System.Serializable]
-    public struct rowData
-    {
-        public bool[] row;
-    }
-
-    public rowData[] rows = new rowData[4]; //Grid of 7x7
-
-    public ArrayLayout(int width, int height)
-    {
-        this.width = width;
-        this.height = height;
-    }
+    public List<Sprite?> images = new List<Sprite?>();
+    // public Sprite? image;
 }

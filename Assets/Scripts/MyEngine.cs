@@ -10,6 +10,7 @@ namespace Scripts
 {
     public class MyEngine : MonoBehaviour
     {
+        public static readonly Random random = new Random();
         public EcsWorld world { get; private set; } = null!;
         private EcsSystems systems = null!;
 
@@ -28,10 +29,13 @@ namespace Scripts
 
         public float pixelPerMeterX { get; private set; }
         public float pixelPerMeterY { get; private set; }
-        public static readonly Random random = new Random();
 
         private void Start()
         {
+            var layout = GetComponent<ArrayLayout>();
+            width = layout.list[0].images.Count;
+            height = layout.list.Count;
+            
             Screen.fullScreen = true;
             world = new EcsWorld();
             systems = new EcsSystems(world);
