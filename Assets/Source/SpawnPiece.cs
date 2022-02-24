@@ -9,7 +9,7 @@ namespace Systems
 {
     public class SpawnPiece : Object
     {
-        public SpawnPiece(MyEngine myEngine, int x, int y)
+        public SpawnPiece(MyEngine myEngine, int x, int y, Sprite? sprite = null)
         {
             var world = myEngine.world;
             var sprites = myEngine.sprites;
@@ -24,7 +24,10 @@ namespace Systems
             ref var position = ref entity.Get<PositionComponent>();
             ref var piece = ref entity.Get<PieceComponent>();
 
-            var index = Convert.ToInt16(MyEngine.random.NextDouble() * (sprites.Length - 1));
+            var index = sprite != null
+                ? sprites.IndexOf(sprite)
+                : Convert.ToInt16(MyEngine.random.NextDouble() * (sprites.Count - 1));
+
             var obj = Instantiate(nodePiece, gameBoard);
 
             piece.value = index;
@@ -38,7 +41,7 @@ namespace Systems
             myEngine.board[x, y] = entity;
 
             var rect = piece.piece.rect.rect;
-            piece.piece.rect.anchoredPosition = new Vector2(-rect.width,-rect.height);
+            piece.piece.rect.anchoredPosition = new Vector2(-rect.width, -rect.height);
 
             piece.piece.isBlocked = true;
             piece.piece.dragOffset = new Vector2(0f, 14f);

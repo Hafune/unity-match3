@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Leopotam.Ecs;
 using Source.Systems;
 using Systems;
@@ -15,15 +16,14 @@ namespace Scripts
         private EcsSystems systems = null!;
 
         public GameObject nodePiece = null!;
-        public Sprite[] sprites = null!;
+        [HideInInspector]public List<Sprite> sprites = null!;
 
-        public int width;
-        public int height;
+        [HideInInspector]public int width;
+        [HideInInspector]public int height;
         
         public Text score = null!;
         public RectTransform gameBoard = null!;
         public RectTransform fallBoard = null!;
-        [HideInInspector] public BoardInitializer boardInitializer = null!;
 
         public EcsEntity?[,] board = null!;
 
@@ -48,7 +48,7 @@ namespace Scripts
 
             systems.Init();
 
-            boardInitializer = new BoardInitializer(this);
+            new BoardInitializer(this);
         }
 
         private void AddInjections()

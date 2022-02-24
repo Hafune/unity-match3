@@ -26,10 +26,11 @@ namespace Systems
             {
                 for (var y = 0; y < height; y++)
                 {
-                    if (layout.list[y].images[x] != null)
-                    {
-                        new SpawnPiece(myEngine, x, y);
-                    }
+                    var sprite = layout.list[height - y - 1].images[x];
+                    if (sprite == null) continue;
+                    
+                    if (myEngine.sprites.IndexOf(sprite) == -1) myEngine.sprites.Add(sprite);
+                    new SpawnPiece(myEngine, x, y, sprite);
                 }
             }
         }
