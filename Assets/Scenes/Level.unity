@@ -361,7 +361,7 @@ GameObject:
   - component: {fileID: 489296729}
   - component: {fileID: 489296731}
   m_Layer: 0
-  m_Name: EcsInit
+  m_Name: MyEngine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -640,7 +640,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 10, y: 900}
-  m_SizeDelta: {x: 285, y: 50}
+  m_SizeDelta: {x: 519.634, y: 50}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &690358683
 MonoBehaviour:
@@ -787,9 +787,9 @@ RectTransform:
   m_Father: {fileID: 690358682}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 111, y: 1.8999939}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -25.5, y: 1.9000244}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1110578383
@@ -862,11 +862,11 @@ RectTransform:
   m_Father: {fileID: 690358682}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 22.591003, y: 1.8999939}
-  m_SizeDelta: {x: 139.0778, y: 30}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -42.84, y: 1.9000244}
+  m_SizeDelta: {x: 139.07782, y: 30}
+  m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &1482933802
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1022,11 +1022,11 @@ RectTransform:
   m_Father: {fileID: 690358682}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -84.45, y: 1.8999939}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 16.7, y: 1.9000244}
   m_SizeDelta: {x: 75.0036, y: 30}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1953978730
 MonoBehaviour:
   m_ObjectHideFlags: 0
