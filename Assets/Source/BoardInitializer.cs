@@ -10,7 +10,7 @@ namespace Systems
     {
         public BoardInitializer(MyEngine myEngine)
         {
-            var layout = myEngine.GetComponent<ArrayLayout>();
+            var layout = myEngine.startLevel;
             myEngine.width = layout.list[0].images.Count;
             myEngine.height = layout.list.Count;
             var width = myEngine.width;

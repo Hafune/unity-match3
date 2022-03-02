@@ -4,14 +4,14 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 
-[CustomEditor(typeof(ArrayLayout))]
-public class CustomPropertyEditor : Editor
+[CustomEditor(typeof(StartPieces))]
+public class PiecesEditor : Editor
 {
-    private ArrayLayout arrayLayout = null!;
+    private StartPieces startPieces = null!;
 
     public void OnEnable()
     {
-        arrayLayout = (ArrayLayout) target;
+        startPieces = (StartPieces) target;
     }
 
     public override void OnInspectorGUI()
@@ -22,15 +22,15 @@ public class CustomPropertyEditor : Editor
         const int buttonHeight = 20;
         var maxCount = 0;
 
-        if (arrayLayout.list.Count == 0) EditorGUILayout.LabelField("Нет элементов в списке");
-        foreach (var item in arrayLayout.list)
+        if (startPieces.list.Count == 0) EditorGUILayout.LabelField("Нет элементов в списке");
+        foreach (var item in startPieces.list)
         {
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.BeginHorizontal();
 
             if (GUILayout.Button("X", GUILayout.Width(buttonWidth), GUILayout.Height(buttonHeight)))
             {
-                arrayLayout.list.Remove(item);
+                startPieces.list.Remove(item);
                 break;
             }
 
@@ -68,16 +68,16 @@ public class CustomPropertyEditor : Editor
 
         if (GUILayout.Button("Добавить строку"))
         {
-            arrayLayout.list.Add(new SelectSprite());
+            startPieces.list.Add(new SelectSprite());
             refreshSpriteCount(maxCount);
         }
 
-        if (GUI.changed) SetDirty(arrayLayout.gameObject);
+        if (GUI.changed) SetDirty(startPieces.gameObject);
     }
 
     private void refreshSpriteCount(int count)
     {
-        foreach (var images in arrayLayout.list.Select(t => t.images))
+        foreach (var images in startPieces.list.Select(t => t.images))
         {
             bool equal;
             do

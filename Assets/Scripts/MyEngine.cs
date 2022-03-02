@@ -30,9 +30,11 @@ namespace Scripts
         public float pixelPerMeterX { get; private set; }
         public float pixelPerMeterY { get; private set; }
 
+        public StartPieces startLevel = null!;
+
         private void Start()
         {
-            var layout = GetComponent<ArrayLayout>();
+            var layout = startLevel;
             width = layout.list[0].images.Count;
             height = layout.list.Count;
             
