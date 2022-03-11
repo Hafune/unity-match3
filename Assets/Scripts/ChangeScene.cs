@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class ChangeScene : MonoBehaviour
 {
-    public SceneNames sceneName = SceneNames.Level;
+    public SceneNames sceneName = SceneNames.Core;
 
     public CanvasGroup menuCanvas = null!;
 

@@ -36,7 +36,7 @@ namespace Source.Systems
 
                 if (!piece.isDragged || piece.isBlocked)
                 {
-                    if (drag.magnitude > 0) drag -= drag * Time.deltaTime * 2;
+                    if (drag.magnitude > 0) drag -= drag * Time.deltaTime * 10;
 
                     if (Math.Abs(drag.x) < .01) drag.x = 0f;
                     if (Math.Abs(drag.y) < .01) drag.y = 0f;

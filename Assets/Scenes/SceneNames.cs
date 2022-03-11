@@ -2,7 +2,7 @@
 {
     public enum SceneNames
     {
-        Level,
+        Core,
         MainMenu
     }
 }
